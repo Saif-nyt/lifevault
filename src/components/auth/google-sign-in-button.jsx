@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 
-const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+const CLIENT_ID =
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+  process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
 export function GoogleSignInButton({ onSuccess }) {
   const { googleLogin } = useAuth();
@@ -58,7 +60,7 @@ export function GoogleSignInButton({ onSuccess }) {
   if (!CLIENT_ID) {
     return (
       <p className="text-center text-xs text-muted-foreground">
-        Google sign-in is not configured. Set NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID.
+        Google sign-in is not configured. Set NEXT_PUBLIC_GOOGLE_CLIENT_ID.
       </p>
     );
   }
