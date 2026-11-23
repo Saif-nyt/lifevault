@@ -328,7 +328,7 @@ export function ArchiveForm({ archive = null, initialType = "note" }) {
                 render={({ field }) => (
                   <div className="flex items-center justify-between rounded-lg border border-border p-3">
                     <div className="flex items-center gap-2">
-                      <Bookmark className={cn("size-4", isFavorite ? "fill-current text-[#b3823f]" : "text-muted-foreground")} />
+                      <Bookmark className={cn("size-4", isFavorite ? "fill-current text-primary" : "text-muted-foreground")} />
                       <div>
                         <p className="text-sm font-medium">Favorite</p>
                         <p className="text-[11px] text-muted-foreground">Keep this close on the dashboard</p>

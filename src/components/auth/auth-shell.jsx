@@ -4,11 +4,14 @@ import { Archive, ArrowLeft, BookOpen, Lock, Search } from "lucide-react";
 export function AuthShell({ eyebrow, title, subtitle, children, footer }) {
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="relative hidden flex-col justify-between overflow-hidden border-r border-border bg-sidebar p-10 lg:flex">
-        <div className="pointer-events-none absolute -left-24 bottom-0 size-96 rounded-full bg-accent/25 blur-3xl" />
+      <div className="relative hidden flex-col justify-between overflow-hidden border-r border-border/60 bg-sidebar p-10 lg:flex">
+        <div className="pointer-events-none absolute -left-24 bottom-0 size-96 rounded-full bg-primary/20 blur-3xl" />
+        <div className="pointer-events-none absolute right-10 top-24 size-40 rounded-full bg-gradient-to-br from-primary via-[#7c5cff] to-[#3b22a8] opacity-70 blur-[2px]" />
+        <div className="pointer-events-none absolute right-6 top-20 size-56 rounded-full bg-primary/30 blur-3xl" />
         <Link href="/" className="relative flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <span className="relative flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#5b34e8] text-white shadow-[0_10px_26px_-10px_var(--glow)]">
             <Archive className="size-4" />
+            <span className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20" />
           </span>
           <span className="font-display text-lg font-semibold">LifeVault</span>
         </Link>
@@ -25,7 +28,7 @@ export function AuthShell({ eyebrow, title, subtitle, children, footer }) {
               { icon: Lock, text: "Private by default, scoped to your account" },
             ].map((item) => (
               <div key={item.text} className="flex items-center gap-3 text-sm text-muted-foreground">
-                <span className="flex size-8 items-center justify-center rounded-lg border border-border bg-card">
+                <span className="flex size-8 items-center justify-center rounded-lg border border-border/70 bg-card">
                   <item.icon className="size-3.5" />
                 </span>
                 {item.text}
@@ -40,7 +43,7 @@ export function AuthShell({ eyebrow, title, subtitle, children, footer }) {
       <div className="flex flex-col">
         <div className="flex items-center justify-between px-5 py-5 sm:px-10">
           <Link href="/" className="flex items-center gap-2 lg:hidden">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#5b34e8] text-white shadow-[0_10px_24px_-12px_var(--glow)]">
               <Archive className="size-4" />
             </span>
             <span className="font-display font-semibold">LifeVault</span>

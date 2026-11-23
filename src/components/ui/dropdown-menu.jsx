@@ -14,7 +14,7 @@ function DropdownMenuContent({ className, sideOffset = 6, ...props }) {
       <DropdownMenuPrimitive.Content
         sideOffset={sideOffset}
         className={cn(
-          "z-[60] min-w-44 overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-lg",
+          "z-[60] min-w-44 overflow-hidden rounded-xl border border-border/80 bg-popover/95 p-1 text-popover-foreground shadow-lg backdrop-blur-xl",
           className
         )}
         {...props}

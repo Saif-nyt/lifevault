@@ -52,16 +52,16 @@ export const ARCHIVE_TYPES = [
 export const TYPE_MAP = Object.fromEntries(ARCHIVE_TYPES.map((type) => [type.value, type]));
 
 export const TYPE_CHIPS = {
-  note: "bg-[#e8ede6] text-[#3d5a44] dark:bg-[#26332a] dark:text-[#b8ceb9]",
-  link: "bg-[#e7ebef] text-[#3f5568] dark:bg-[#262f36] dark:text-[#b5c8d5]",
-  memory: "bg-[#f1e5e4] text-[#7a4b4b] dark:bg-[#3a292a] dark:text-[#e0b9b5]",
-  video: "bg-[#ebe6f0] text-[#5b4a70] dark:bg-[#312a3a] dark:text-[#d2c2e2]",
-  image: "bg-[#efe9dd] text-[#6d5a3c] dark:bg-[#352f25] dark:text-[#dbc7a5]",
-  document: "bg-[#ece9e2] text-[#5b554a] dark:bg-[#2c2b25] dark:text-[#c8c2b4]",
-  book: "bg-[#e9ebe0] text-[#56603c] dark:bg-[#2d3225] dark:text-[#c6d2a6]",
-  movie: "bg-[#f0e7e2] text-[#7a5040] dark:bg-[#362a24] dark:text-[#e2bba8]",
-  idea: "bg-[#f3edda] text-[#74602a] dark:bg-[#383222] dark:text-[#e6ce8d]",
-  event: "bg-[#e3ecec] text-[#3f6060] dark:bg-[#243333] dark:text-[#aed3d2]",
+  note: "bg-emerald-500/10 text-emerald-700 ring-1 ring-inset ring-emerald-500/20 dark:text-emerald-300",
+  link: "bg-sky-500/10 text-sky-700 ring-1 ring-inset ring-sky-500/20 dark:text-sky-300",
+  memory: "bg-rose-500/10 text-rose-700 ring-1 ring-inset ring-rose-500/20 dark:text-rose-300",
+  video: "bg-violet-500/10 text-violet-700 ring-1 ring-inset ring-violet-500/20 dark:text-violet-300",
+  image: "bg-amber-500/10 text-amber-700 ring-1 ring-inset ring-amber-500/20 dark:text-amber-300",
+  document: "bg-slate-500/10 text-slate-700 ring-1 ring-inset ring-slate-500/20 dark:text-slate-300",
+  book: "bg-lime-500/10 text-lime-700 ring-1 ring-inset ring-lime-500/20 dark:text-lime-300",
+  movie: "bg-orange-500/10 text-orange-700 ring-1 ring-inset ring-orange-500/20 dark:text-orange-300",
+  idea: "bg-yellow-500/10 text-yellow-700 ring-1 ring-inset ring-yellow-500/20 dark:text-yellow-300",
+  event: "bg-teal-500/10 text-teal-700 ring-1 ring-inset ring-teal-500/20 dark:text-teal-300",
 };
 
 export const BOOK_STATUS = [

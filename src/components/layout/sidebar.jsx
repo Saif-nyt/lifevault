@@ -2,8 +2,20 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Archive, LogOut, Moon, Plus, Search, Settings, Sun, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  Archive,
+  LogOut,
+  Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Plus,
+  Search,
+  Settings,
+  Sparkles,
+  Sun,
+  User,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -19,54 +31,111 @@ import { cn, initials } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { useTheme } from "@/context/theme-context";
 import { ReminderBell } from "./reminder-bell";
+import { useSidebar } from "./sidebar-context";
+
+const MAIN_NAV = NAV_ITEMS.filter((item) => item.href !== "/settings");
+const SETTINGS_ITEM = NAV_ITEMS.find((item) => item.href === "/settings");
+
+function isActive(pathname, href) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function NavLink({ item, active, collapsed, onNavigate }) {
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      title={collapsed ? item.label : undefined}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "group flex items-center rounded-xl transition-colors",
+        collapsed ? "justify-center p-1" : "gap-3 px-2 py-1.5",
+        active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+      )}
+    >
+      <span
+        className={cn(
+          "flex size-10 shrink-0 items-center justify-center rounded-xl transition-all",
+          active
+            ? "bg-primary text-primary-foreground shadow-[0_12px_28px_-12px_var(--glow)]"
+            : "group-hover:bg-secondary/70"
+        )}
+      >
+        <item.icon className="size-[18px]" />
+      </span>
+      {!collapsed ? (
+        <span className={cn("truncate text-sm", active ? "font-medium" : "font-normal")}>{item.label}</span>
+      ) : null}
+    </Link>
+  );
+}
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { collapsed, toggle } = useSidebar();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border bg-sidebar lg:flex">
-      <div className="px-6 pb-6 pt-7">
-        <Link href="/dashboard" className="flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Archive className="size-4" />
+    <aside
+      className={cn(
+        "fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-border/60 bg-sidebar/80 backdrop-blur-xl transition-[width] duration-200 lg:flex",
+        collapsed ? "w-[76px]" : "w-64"
+      )}
+    >
+      <div className={cn("flex border-b border-border/50 px-3", collapsed ? "flex-col items-center gap-1 py-3" : "h-16 items-center gap-2")}>
+        <Link href="/dashboard" className={cn("flex min-w-0 items-center gap-2.5", collapsed && "justify-center")}>
+          <span className="relative flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#5b34e8] text-white shadow-[0_10px_26px_-10px_var(--glow)]">
+            <Sparkles className="size-4" />
+            <span className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20" />
           </span>
-          <span>
-            <span className="block font-display text-lg font-semibold leading-none">LifeVault</span>
-            <span className="mt-1 block text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Personal archive</span>
-          </span>
+          {!collapsed ? (
+            <span className="min-w-0">
+              <span className="block truncate text-base font-semibold leading-none">LifeVault</span>
+              <span className="mt-1 block truncate text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                Personal archive
+              </span>
+            </span>
+          ) : null}
         </Link>
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className={cn(
+            "flex items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground",
+            collapsed ? "size-7" : "ml-auto size-8"
+          )}
+        >
+          {collapsed ? <PanelLeftOpen className="size-4" /> : <PanelLeftClose className="size-4" />}
+        </button>
       </div>
 
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4">
-        {NAV_ITEMS.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                active
-                  ? "bg-card font-medium text-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-card/70 hover:text-foreground"
-              )}
-            >
-              <item.icon className={cn("size-4", active && "text-primary")} />
-              {item.label}
-            </Link>
-          );
-        })}
+      <nav className={cn("flex-1 overflow-y-auto py-3", collapsed ? "space-y-1 px-2" : "space-y-0.5 px-3")}>
+        {MAIN_NAV.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            active={isActive(pathname, item.href)}
+            collapsed={collapsed}
+          />
+        ))}
       </nav>
 
-      <div className="space-y-3 border-t border-border p-4">
-        <Button asChild className="w-full justify-start">
-          <Link href="/archives/new">
-            <Plus /> Quick capture
+      <div className={cn("border-t border-border/50", collapsed ? "space-y-2 p-2" : "space-y-2 p-3")}>
+        <Button asChild size={collapsed ? "icon" : "default"} className={cn(!collapsed && "w-full justify-start")}>
+          <Link href="/archives/new" title={collapsed ? "Quick capture" : undefined}>
+            <Plus />
+            {!collapsed ? "Quick capture" : null}
           </Link>
         </Button>
-        <p className="px-1 text-[11px] leading-relaxed text-muted-foreground">
-          Capture anything. Organize lightly. Rediscover often.
-        </p>
+        {SETTINGS_ITEM ? (
+          <NavLink item={SETTINGS_ITEM} active={isActive(pathname, SETTINGS_ITEM.href)} collapsed={collapsed} />
+        ) : null}
+        {!collapsed ? (
+          <p className="px-2 pt-1 text-[11px] leading-relaxed text-muted-foreground">
+            Capture anything. Organize lightly. Rediscover often.
+          </p>
+        ) : null}
       </div>
     </aside>
   );
@@ -77,6 +146,21 @@ export function Topbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [query, setQuery] = useState("");
+  const searchRef = useRef(null);
+
+  useEffect(() => {
+    function onKeyDown(event) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        searchRef.current?.focus();
+      }
+      if (event.key === "Escape" && document.activeElement === searchRef.current) {
+        searchRef.current?.blur();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   function handleSearch(event) {
     event.preventDefault();
@@ -90,35 +174,37 @@ export function Topbar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:px-8">
         <Link href="/dashboard" className="mr-1 flex items-center gap-2 lg:hidden">
-          <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Archive className="size-4" />
+          <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#5b34e8] text-white shadow-[0_10px_24px_-12px_var(--glow)]">
+            <Sparkles className="size-4" />
           </span>
-          <span className="font-display text-base font-semibold">LifeVault</span>
+          <span className="text-base font-semibold">LifeVault</span>
         </Link>
 
         <form onSubmit={handleSearch} className="relative hidden flex-1 max-w-md md:block">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
+            ref={searchRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search your archive…"
-            className="h-9 w-full rounded-lg border border-border bg-card pl-9 pr-14 text-sm outline-none transition focus:ring-2 focus:ring-ring/30"
+            aria-label="Search your archive"
+            className="h-10 w-full rounded-xl border border-input bg-secondary/40 pl-9 pr-16 text-sm outline-none transition focus:ring-2 focus:ring-ring/40"
           />
-          <kbd className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block">
-            Enter
+          <kbd className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded-md border border-border bg-card/60 px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block">
+            ⌘K
           </kbd>
         </form>
 
         <div className="flex flex-1 items-center justify-end gap-1 sm:gap-2">
-          <Button asChild size="sm" className="md:hidden">
-            <Link href="/archives/new">
-              <Plus /> Capture
+          <Button asChild variant="ghost" size="icon" className="md:hidden" aria-label="Search archive">
+            <Link href="/archives">
+              <Search />
             </Link>
           </Button>
-          <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
+          <Button asChild size="sm" className="hidden md:inline-flex">
             <Link href="/archives/new">
               <Plus /> Capture
             </Link>
@@ -130,8 +216,11 @@ export function Topbar() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="ml-0.5 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring" aria-label="Account menu">
-                <Avatar>
+              <button
+                className="ml-0.5 rounded-full outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Account menu"
+              >
+                <Avatar className="ring-1 ring-border/80">
                   {user?.avatar ? <AvatarImage src={user.avatar} alt={user.name} /> : null}
                   <AvatarFallback>{initials(user?.name)}</AvatarFallback>
                 </Avatar>
@@ -148,6 +237,9 @@ export function Topbar() {
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => router.push("/settings")}>
                 <Settings /> Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push("/dashboard")}>
+                <Archive /> Dashboard
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={handleLogout} className="text-destructive focus:text-destructive">

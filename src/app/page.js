@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/auth-context";
 import { useTheme } from "@/context/theme-context";
 
@@ -73,12 +74,13 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur-md">
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
           <Link href="/" className="flex shrink-0 items-center gap-2">
-            <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Archive className="size-4" />
+            <span className="relative flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#5b34e8] text-white shadow-[0_10px_24px_-12px_var(--glow)]">
+              <Sparkles className="size-4" />
+              <span className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/20" />
             </span>
             <span className="font-display text-base font-semibold">LifeVault</span>
           </Link>
@@ -90,6 +92,11 @@ export default function LandingPage() {
           </nav>
 
           <div className="ml-auto flex items-center gap-1.5">
+            <Button asChild variant="ghost" size="icon" aria-label="Search" className="size-9">
+              <a href="#search">
+                <Search className="size-4" />
+              </a>
+            </Button>
             <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme" className="size-9">
               {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </Button>
@@ -114,15 +121,16 @@ export default function LandingPage() {
 
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
         {/* Welcome + search */}
-        <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <section id="search" className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div className="pointer-events-none absolute -top-10 right-0 -z-10 hidden size-72 rounded-full bg-primary/20 blur-3xl lg:block" />
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+            <Badge variant="outline" className="bg-card/60 text-muted-foreground">
               <Sparkles className="size-3.5 text-primary" />
               Your personal archive
-            </p>
+            </Badge>
             <h1 className="mt-5 font-display text-4xl leading-tight tracking-tight sm:text-5xl">
               Everything worth remembering.{" "}
-              <span className="italic text-primary">One place.</span>
+              <span className="text-primary">One place.</span>
             </h1>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
               Your knowledge, memories, ideas and discoveries, organized in your personal space.
@@ -133,9 +141,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <form onSubmit={handleSearch} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <form onSubmit={handleSearch} className="rounded-2xl border border-border/80 bg-card/80 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04),0_24px_60px_-40px_var(--glow)] backdrop-blur-sm">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-              <Search className="size-3.5" /> Universal search
+              <Search className="size-3.5 text-primary" /> Universal search
             </div>
             <div className="relative mt-3">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -143,7 +151,7 @@ export default function LandingPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={user ? "Search your vault…" : "Search (sign in to search your data)…"}
-                className="h-11 pl-10"
+                className="h-11 bg-secondary/40 pl-10"
               />
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
@@ -173,15 +181,16 @@ export default function LandingPage() {
               <Link
                 key={c.label}
                 href={categoryHref(c.href)}
-                className="group flex items-start gap-3 rounded-xl border border-border bg-card p-4 transition hover:border-foreground/20 hover:bg-secondary/40"
+                className="group flex items-start gap-3 rounded-2xl border border-border/80 bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:bg-secondary/30 hover:shadow-[0_20px_44px_-30px_var(--glow)]"
               >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <c.icon className="size-5" />
                 </span>
                 <div className="min-w-0">
                   <p className="font-medium">{c.label}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">{c.desc}</p>
                 </div>
+                <ArrowRight className="ml-auto size-4 shrink-0 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
               </Link>
             ))}
           </div>
@@ -189,7 +198,7 @@ export default function LandingPage() {
 
         {/* Quick capture preview */}
         <section id="capture" className="mt-12 sm:mt-16">
-          <div className="rounded-2xl border border-border bg-card p-5 sm:p-6">
+          <div className="rounded-2xl border border-border/80 bg-card p-5 sm:p-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Quick capture</p>
@@ -203,7 +212,7 @@ export default function LandingPage() {
               {QUICK_CAPTURE.map((q) => (
                 <span
                   key={q.label}
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1.5 text-sm"
+                  className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-secondary/50 px-3 py-1.5 text-sm"
                 >
                   <q.icon className="size-4 text-primary" />
                   {q.label}
@@ -230,15 +239,13 @@ export default function LandingPage() {
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">Preview</p>
               <h2 className="mt-2 font-display text-2xl tracking-tight sm:text-3xl">How your archive looks</h2>
             </div>
-            <span className="rounded-full border border-border bg-card px-2.5 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-              Sample content
-            </span>
+            <Badge variant="outline">Sample content</Badge>
           </div>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {SAMPLE_CARDS.map((card) => (
-              <div key={card.title} className="rounded-xl border border-border bg-card p-4">
+              <div key={card.title} className="rounded-2xl border border-border/80 bg-card p-4">
                 <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  <card.icon className="size-3" /> {card.type}
+                  <card.icon className="size-3 text-primary" /> {card.type}
                 </div>
                 <p className="mt-2 font-display text-base font-semibold">{card.title}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{card.meta}</p>
@@ -252,12 +259,14 @@ export default function LandingPage() {
 
         {/* Final CTA */}
         <section className="mt-12 sm:mt-16">
-          <div className="rounded-2xl border border-border bg-sidebar p-8 text-center sm:p-12">
-            <h2 className="font-display text-3xl tracking-tight sm:text-4xl">Create your vault.</h2>
-            <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
+          <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card p-6 text-center sm:p-8">
+            <div className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full bg-primary/25 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-20 -left-10 size-40 rounded-full bg-primary/10 blur-3xl" />
+            <h2 className="relative font-display text-3xl tracking-tight sm:text-4xl">Create your vault.</h2>
+            <p className="relative mx-auto mt-3 max-w-md text-sm text-muted-foreground">
               Start with one thing worth remembering.
             </p>
-            <Button asChild size="lg" className="mt-6">
+            <Button asChild size="lg" className="relative mt-6">
               <Link href={primaryHref}>
                 {primaryLabel} <ArrowRight />
               </Link>
@@ -266,7 +275,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border">
+      <footer className="border-t border-border/60">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
             <Archive className="size-4" />

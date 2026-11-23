@@ -17,33 +17,63 @@ import {
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/page-header";
 import { ArchiveGrid } from "@/components/archives/archive-card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/use-api";
 import { useAuth } from "@/context/auth-context";
 import { dashboardService } from "@/services/dashboard.service";
 import { archiveService } from "@/services/archive.service";
-import { TYPE_MAP } from "@/lib/constants";
-import { formatDateTime, relativeTime } from "@/lib/utils";
+import { TYPE_CHIPS, TYPE_MAP } from "@/lib/constants";
+import { cn, formatDate, formatDateTime, relativeTime } from "@/lib/utils";
 
 function StatCard({ icon: Icon, label, value, hint, href }) {
-  const content = (
-    <div className="flex items-start justify-between gap-2 rounded-xl border border-border bg-card p-4 transition hover:border-foreground/20 sm:p-5">
-      <div className="min-w-0">
-        <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground sm:text-xs">{label}</p>
-        <p className="mt-2 font-display text-2xl font-semibold sm:text-3xl">{value ?? "—"}</p>
-        {hint ? <p className="mt-1 text-[11px] text-muted-foreground sm:text-xs">{hint}</p> : null}
+  return (
+    <Link
+      href={href}
+      className="group rounded-2xl border border-border/80 bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_18px_40px_-28px_var(--glow)]"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</span>
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+          <Icon className="size-4" />
+        </span>
       </div>
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-primary sm:size-9">
-        <Icon className="size-4" />
-      </span>
-    </div>
+      <p className="mt-3 font-display text-3xl font-semibold">{value ?? "—"}</p>
+      <p className="mt-0.5 text-[11px] text-muted-foreground">{hint}</p>
+    </Link>
   );
-  return href ? <Link href={href}>{content}</Link> : content;
+}
+
+function Panel({ title, meta, action, children, className }) {
+  return (
+    <section className={cn("flex flex-col rounded-2xl border border-border/80 bg-card", className)}>
+      <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3.5">
+        <div className="flex min-w-0 items-center gap-2">
+          <h2 className="truncate text-sm font-semibold">{title}</h2>
+          {meta ? <span className="truncate text-xs text-muted-foreground">· {meta}</span> : null}
+        </div>
+        {action}
+      </div>
+      <div className="flex-1 p-2.5">{children}</div>
+    </section>
+  );
+}
+
+function TypeTile({ type, className }) {
+  const meta = TYPE_MAP[type] || TYPE_MAP.note;
+  const Icon = meta.icon;
+  return (
+    <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg", TYPE_CHIPS[type], className)}>
+      <Icon className="size-4" />
+    </span>
+  );
+}
+
+function greeting() {
+  return "Welcome back";
 }
 
 export default function DashboardPage() {
@@ -81,11 +111,16 @@ export default function DashboardPage() {
   const firstName = user?.name?.split(" ")[0] || "there";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PageHeader
         eyebrow="Dashboard"
-        title={`Welcome back, ${firstName}`}
-        description="Here is the shape of your archive today — recent additions, favorites and things worth revisiting."
+        title={
+          <span className="inline-flex items-center gap-2">
+            {greeting()}, {firstName}
+            <Sparkles className="size-5 text-primary" />
+          </span>
+        }
+        description="Your archive is ready. Recent additions, favorites and the things worth revisiting."
         actions={
           <>
             <Button asChild variant="outline">
@@ -108,7 +143,8 @@ export default function DashboardPage() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search titles, notes, tags, links…"
-          className="h-12 w-full rounded-xl border border-border bg-card pl-11 pr-24 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-ring/30"
+          aria-label="Search your archive"
+          className="h-12 w-full rounded-2xl border border-input bg-card/60 pl-11 pr-24 text-sm shadow-inner shadow-black/5 outline-none transition focus:ring-2 focus:ring-ring/40"
         />
         <Button type="submit" size="sm" className="absolute right-2 top-1/2 -translate-y-1/2">
           Search
@@ -118,15 +154,15 @@ export default function DashboardPage() {
       {error ? <ErrorState error={error} onRetry={refresh} /> : null}
 
       {loading ? (
-        <div className="space-y-8">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             {Array.from({ length: 4 }).map((_, index) => (
               <Skeleton key={index} className="h-28" />
             ))}
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 xl:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
-              <Skeleton key={index} className="h-44" />
+              <Skeleton key={index} className="h-64" />
             ))}
           </div>
         </div>
@@ -134,59 +170,48 @@ export default function DashboardPage() {
 
       {!loading && data ? (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <StatCard icon={Layers} label="Archived items" value={data.stats.totalItems} hint="Everything you have saved" href="/archives" />
             <StatCard icon={Bookmark} label="Favorites" value={data.stats.favorites} hint="Kept close" href="/favorites" />
-            <StatCard icon={CalendarClock} label="Upcoming reminders" value={data.stats.upcomingReminders} hint="Coming up next" href="/reminders" />
+            <StatCard icon={CalendarClock} label="Upcoming" value={data.stats.upcomingReminders} hint="Reminders ahead" href="/reminders" />
             <StatCard icon={FolderHeart} label="Collections" value={data.stats.collections} hint="Curated groups" href="/collections" />
           </div>
 
-          {data.stats.categories.length ? (
-            <section className="rounded-xl border border-border bg-card p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-display text-lg font-semibold">Your categories</h2>
-                  <p className="text-xs text-muted-foreground">
-                    A quick way back into each part of your archive — {data.stats.tags} tags in use.
-                  </p>
-                </div>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/settings">
-                    Manage <ArrowRight />
-                  </Link>
-                </Button>
-              </div>
-              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-                {data.stats.categories.slice(0, 10).map((category) => (
-                  <Link
-                    key={category.id}
-                    href={`/archives?category=${category.id}`}
-                    className="group flex items-center gap-2.5 rounded-lg border border-border/70 px-3 py-2.5 transition hover:border-foreground/20 hover:bg-secondary/40"
-                  >
-                    <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />
-                    <span className="truncate text-sm">{category.name}</span>
-                    <span className="ml-auto text-xs text-muted-foreground">{category.itemCount}</span>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          <div className="grid gap-6 xl:grid-cols-[1.65fr_1fr]">
-            <section className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-display text-lg font-semibold">Recently saved</h2>
-                  <p className="text-xs text-muted-foreground">The latest additions to your vault.</p>
-                </div>
+          <div className="grid gap-4 xl:grid-cols-3">
+            <Panel
+              title="Recently saved"
+              meta="Latest additions"
+              className="xl:col-span-2"
+              action={
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/archives">
                     View all <ArrowRight />
                   </Link>
                 </Button>
-              </div>
+              }
+            >
               {data.recent.length ? (
-                <ArchiveGrid items={data.recent} onFavorite={handleFavorite} />
+                <div className="divide-y divide-border/50">
+                  {data.recent.slice(0, 5).map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/archives/${item.id}`}
+                      className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-secondary/50"
+                    >
+                      <TypeTile type={item.type} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium">{item.title}</span>
+                        <span className="block truncate text-[11px] text-muted-foreground">
+                          {(TYPE_MAP[item.type] || TYPE_MAP.note).label} · {relativeTime(item.createdAt)}
+                          {item.category ? ` · ${item.category.name}` : ""}
+                        </span>
+                      </span>
+                      <span className="hidden shrink-0 text-[11px] text-muted-foreground sm:block">
+                        {formatDate(item.createdAt)}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
               ) : (
                 <EmptyState
                   title="Your archive is waiting"
@@ -195,71 +220,100 @@ export default function DashboardPage() {
                   actionHref="/archives/new"
                 />
               )}
-            </section>
+            </Panel>
 
-            <div className="space-y-6">
-              <Card>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="font-display text-base">Favorites</CardTitle>
-                    <Bookmark className="size-4 text-muted-foreground" />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {data.favorites.length ? (
-                    data.favorites.slice(0, 4).map((item) => (
-                      <Link
-                        key={item.id}
-                        href={`/archives/${item.id}`}
-                        className="flex items-center gap-3 rounded-lg border border-border/60 p-2.5 transition hover:bg-secondary/40"
-                      >
-                        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-secondary text-primary">
-                          {(() => {
-                            const Icon = (TYPE_MAP[item.type] || TYPE_MAP.note).icon;
-                            return <Icon className="size-3.5" />;
-                          })()}
+            <Panel
+              title="Upcoming"
+              meta="Reminders"
+              action={
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/reminders" aria-label="Manage reminders">
+                    <ArrowRight />
+                  </Link>
+                </Button>
+              }
+            >
+              {data.reminders.length ? (
+                <div className="space-y-1">
+                  {data.reminders.slice(0, 5).map((reminder) => {
+                    const date = new Date(reminder.remindAt);
+                    return (
+                      <div key={reminder.id} className="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-secondary/50">
+                        <span className="flex size-9 shrink-0 flex-col items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <span className="text-xs font-semibold leading-none">{date.getDate()}</span>
+                          <span className="mt-0.5 text-[9px] uppercase leading-none">
+                            {date.toLocaleString("en", { month: "short" })}
+                          </span>
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm">{item.title}</span>
-                          <span className="block text-[11px] text-muted-foreground">{item.type}</span>
+                          <span className="block truncate text-sm">{reminder.title}</span>
+                          <span className="block truncate text-[11px] text-muted-foreground">
+                            {formatDateTime(reminder.remindAt)}
+                          </span>
                         </span>
-                      </Link>
-                    ))
-                  ) : (
-                    <p className="py-4 text-center text-sm text-muted-foreground">Favorite something to keep it here.</p>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="font-display text-base">Upcoming reminders</CardTitle>
-                    <CalendarClock className="size-4 text-muted-foreground" />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {data.reminders.length ? (
-                    data.reminders.map((reminder) => (
-                      <div key={reminder.id} className="rounded-lg border border-border/60 p-2.5">
-                        <p className="truncate text-sm">{reminder.title}</p>
-                        <p className="text-[11px] text-muted-foreground">
-                          {formatDateTime(reminder.remindAt)} · {relativeTime(reminder.remindAt)}
-                        </p>
                       </div>
-                    ))
-                  ) : (
-                    <p className="py-4 text-center text-sm text-muted-foreground">No upcoming reminders.</p>
-                  )}
-                  <Button asChild variant="outline" size="sm" className="w-full">
-                    <Link href="/reminders">Manage reminders</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="px-3 py-8 text-center text-sm text-muted-foreground">No upcoming reminders.</p>
+              )}
+            </Panel>
           </div>
 
-          <section className="space-y-4">
+          <div className="grid gap-4 xl:grid-cols-3">
+            <Panel title="By type" meta="Your archive mix" className="xl:col-span-2">
+              {data.stats.byType?.length ? (
+                <div className="grid gap-1 sm:grid-cols-2">
+                  {data.stats.byType.map((entry) => {
+                    const meta = TYPE_MAP[entry.type] || TYPE_MAP.note;
+                    const Icon = meta.icon;
+                    return (
+                      <Link
+                        key={entry.type}
+                        href={`/archives?type=${entry.type}`}
+                        className="flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-secondary/50"
+                      >
+                        <span className={cn("flex size-9 items-center justify-center rounded-lg", TYPE_CHIPS[entry.type])}>
+                          <Icon className="size-4" />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-sm">{meta.label}</span>
+                        <Badge variant="success">{entry.count}</Badge>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="px-3 py-8 text-center text-sm text-muted-foreground">Nothing archived yet.</p>
+              )}
+            </Panel>
+
+            <Panel
+              title="Favorites"
+              meta="Kept close"
+              action={<Bookmark className="size-4 text-muted-foreground" />}
+            >
+              {data.favorites.length ? (
+                <div className="space-y-1">
+                  {data.favorites.slice(0, 5).map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/archives/${item.id}`}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-secondary/50"
+                    >
+                      <TypeTile type={item.type} />
+                      <span className="min-w-0 flex-1 truncate text-sm">{item.title}</span>
+                      <Bookmark className="size-3.5 shrink-0 fill-current text-primary" />
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="px-3 py-8 text-center text-sm text-muted-foreground">Favorite something to keep it here.</p>
+              )}
+            </Panel>
+          </div>
+
+          <section className="space-y-3">
             <div className="flex items-end justify-between">
               <div>
                 <h2 className="flex items-center gap-2 font-display text-lg font-semibold">

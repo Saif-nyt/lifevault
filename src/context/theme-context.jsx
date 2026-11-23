@@ -2,15 +2,15 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-const ThemeContext = createContext({ theme: "light", toggleTheme: () => {}, setTheme: () => {} });
+const ThemeContext = createContext({ theme: "dark", toggleTheme: () => {}, setTheme: () => {} });
 const STORAGE_KEY = "lifevault-theme";
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState("light");
+  const [theme, setThemeState] = useState("dark");
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    const preferred = stored || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const preferred = stored || "dark";
     setThemeState(preferred);
   }, []);
 

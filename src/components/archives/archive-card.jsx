@@ -17,7 +17,7 @@ export function ArchiveCard({ item, onFavorite, compact = false }) {
   const memoryDate = item.metadata?.memoryDate || item.metadata?.eventDate;
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-card transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_24px_50px_-32px_var(--glow)]">
       {image && !compact ? (
         <div className="h-36 w-full overflow-hidden bg-muted">
           <img src={image.url} alt="" className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
@@ -40,8 +40,8 @@ export function ArchiveCard({ item, onFavorite, compact = false }) {
               }}
               aria-label={item.isFavorite ? "Remove from favorites" : "Add to favorites"}
               className={cn(
-                "rounded-full p-1.5 transition-colors hover:bg-secondary",
-                item.isFavorite ? "text-[#b3823f]" : "text-muted-foreground/60"
+                "rounded-lg p-1.5 transition-colors hover:bg-secondary",
+                item.isFavorite ? "text-primary" : "text-muted-foreground/60"
               )}
             >
               <Bookmark className={cn("size-4", item.isFavorite && "fill-current")} />
@@ -123,7 +123,7 @@ export function ArchiveListItem({ item, onFavorite }) {
       </div>
       {onFavorite ? (
         <Button variant="ghost" size="icon-sm" onClick={() => onFavorite(item)} aria-label="Toggle favorite">
-          <Bookmark className={cn("size-4", item.isFavorite && "fill-current text-[#b3823f]")} />
+          <Bookmark className={cn("size-4", item.isFavorite && "fill-current text-primary")} />
         </Button>
       ) : null}
     </article>

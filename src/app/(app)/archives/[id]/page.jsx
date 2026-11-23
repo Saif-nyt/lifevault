@@ -138,7 +138,7 @@ export default function ArchiveDetailPage() {
         </Button>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={toggleFavorite}>
-            <Bookmark className={cn(archive.isFavorite && "fill-current text-[#b3823f]")} />
+            <Bookmark className={cn(archive.isFavorite && "fill-current text-primary")} />
             {archive.isFavorite ? "Favorited" : "Favorite"}
           </Button>
           <Button variant="outline" size="sm" onClick={() => setCollectionOpen(true)}>

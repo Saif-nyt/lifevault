@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Archive, LogOut, MoreHorizontal, Search } from "lucide-react";
+import { Archive, LogOut, MoreHorizontal, Plus, Search } from "lucide-react";
 import { NAV_ITEMS, MOBILE_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
@@ -20,7 +20,15 @@ export function MobileNav() {
 
   return (
     <>
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 backdrop-blur-md lg:hidden">
+      <Link
+        href="/archives/new"
+        aria-label="Quick capture"
+        className="fixed bottom-[calc(4.6rem+env(safe-area-inset-bottom))] right-4 z-40 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_18px_40px_-12px_var(--glow)] transition-transform active:scale-95 lg:hidden"
+      >
+        <Plus className="size-6" />
+      </Link>
+
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-card/85 backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-md items-stretch justify-around px-2 pb-[env(safe-area-inset-bottom)]">
           {MOBILE_NAV.map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -29,11 +37,18 @@ export function MobileNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px]",
-                  active ? "text-primary" : "text-muted-foreground"
+                  "flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] transition-colors",
+                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <item.icon className="size-5" />
+                <span
+                  className={cn(
+                    "flex size-8 items-center justify-center rounded-lg transition-colors",
+                    active && "bg-primary/15"
+                  )}
+                >
+                  <item.icon className="size-5" />
+                </span>
                 {item.label}
               </Link>
             );
@@ -42,11 +57,13 @@ export function MobileNav() {
             type="button"
             onClick={() => setMoreOpen(true)}
             className={cn(
-              "flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px]",
-              moreOpen ? "text-primary" : "text-muted-foreground"
+              "flex flex-1 flex-col items-center gap-1 py-2.5 text-[10px] transition-colors",
+              moreOpen ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <MoreHorizontal className="size-5" />
+            <span className={cn("flex size-8 items-center justify-center rounded-lg", moreOpen && "bg-primary/15")}>
+              <MoreHorizontal className="size-5" />
+            </span>
             More
           </button>
         </div>
@@ -58,7 +75,7 @@ export function MobileNav() {
             <DialogTitle>Everything in your vault</DialogTitle>
           </DialogHeader>
 
-          <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/40 p-3">
+          <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-secondary/40 p-3">
             <Avatar>
               {user?.avatar ? <AvatarImage src={user.avatar} alt={user.name} /> : null}
               <AvatarFallback>{initials(user?.name)}</AvatarFallback>
@@ -82,7 +99,7 @@ export function MobileNav() {
             <input
               name="q"
               placeholder="Search your archive…"
-              className="h-10 w-full rounded-lg border border-input bg-card pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+              className="h-10 w-full rounded-xl border border-input bg-secondary/40 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
             />
           </form>
 
@@ -95,11 +112,11 @@ export function MobileNav() {
                   href={item.href}
                   onClick={() => setMoreOpen(false)}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-lg border border-border px-3 py-2.5 text-sm",
-                    active ? "bg-secondary font-medium" : "bg-card"
+                    "flex items-center gap-2.5 rounded-xl border border-border/70 px-3 py-2.5 text-sm transition-colors",
+                    active ? "bg-primary/15 font-medium text-primary" : "bg-card/40 hover:bg-secondary/60"
                   )}
                 >
-                  <item.icon className="size-4 text-muted-foreground" />
+                  <item.icon className="size-4" />
                   {item.label}
                 </Link>
               );
@@ -142,7 +159,9 @@ export function AuthGuard({ children }) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <Archive className="size-6 animate-pulse" />
+          <span className="flex size-10 animate-pulse items-center justify-center rounded-xl bg-primary/20 text-primary">
+            <Archive className="size-5" />
+          </span>
           <p className="text-xs uppercase tracking-[0.2em]">Opening your vault</p>
         </div>
       </div>

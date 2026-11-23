@@ -18,8 +18,8 @@ export const metadata = {
 
 export const viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f4ee" },
-    { media: "(prefers-color-scheme: dark)", color: "#121310" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f4fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#08070d" },
   ],
 };
 
@@ -27,7 +27,7 @@ const themeScript = `
 (function() {
   try {
     var stored = localStorage.getItem('lifevault-theme');
-    var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var dark = stored ? stored === 'dark' : true;
     if (dark) document.documentElement.classList.add('dark');
   } catch (e) {}
 })();
