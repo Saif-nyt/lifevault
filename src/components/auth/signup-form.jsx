@@ -11,6 +11,7 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import { useAuth } from "@/context/auth-context";
 
 const schema = z
@@ -125,6 +126,16 @@ export function SignupForm() {
           {isSubmitting ? <Loader2 className="animate-spin" /> : null}
           Create my vault
         </Button>
+
+        <div className="relative my-2">
+          <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/60" /></div>
+          <div className="relative flex justify-center text-[10px] uppercase tracking-widest text-muted-foreground">
+            <span className="bg-popover px-2">or</span>
+          </div>
+        </div>
+
+        <GoogleSignInButton onSuccess={() => router.replace("/dashboard")} />
+
         <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
           Your password is hashed on the server. Sessions are kept in secure, HTTP-only cookies.
         </p>

@@ -9,6 +9,10 @@ export const authService = {
     const res = await apiRequest("/auth/login", { method: "POST", body: payload });
     return res.data.user;
   },
+  async googleLogin(idToken) {
+    const res = await apiRequest("/auth/google", { method: "POST", body: { idToken } });
+    return res.data.user;
+  },
   async logout() {
     await apiRequest("/auth/logout", { method: "POST" });
   },

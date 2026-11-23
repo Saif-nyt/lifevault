@@ -43,6 +43,7 @@ Start the backend first. Any authenticated page needs it; if it is unreachable t
 | Variable | Required | Description |
 | --- | --- | --- |
 | `NEXT_PUBLIC_API_URL` | **yes** | Full API base **including** `/api/v1`, e.g. `https://api.example.com/api/v1`. |
+| `NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID` | no | Google OAuth web client ID. Enables the "Continue with Google" button; leave empty to hide it. |
 
 This is the only variable. `NEXT_PUBLIC_*` values are compiled into the browser bundle — never put secrets here. `.env*` is gitignored; `.env.example` is the committed template.
 

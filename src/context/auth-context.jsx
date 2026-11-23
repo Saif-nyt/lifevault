@@ -37,6 +37,12 @@ export function AuthProvider({ children }) {
     return current;
   }
 
+  async function googleLogin(idToken) {
+    const current = await authService.googleLogin(idToken);
+    setUser(current);
+    return current;
+  }
+
   async function register(payload) {
     const current = await authService.register(payload);
     setUser(current);
@@ -52,7 +58,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refresh, setUser }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refresh, setUser, googleLogin }}>
       {children}
     </AuthContext.Provider>
   );
