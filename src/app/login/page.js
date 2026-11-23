@@ -6,7 +6,7 @@ export const metadata = { title: "Log in" };
 export default function LoginPage() {
   return (
     <Suspense fallback={<div className="min-h-screen" />}>
-      <LoginForm />
+      <LoginForm googleClientId={process.env.GOOGLE_CLIENT_ID} />
     </Suspense>
   );
 }

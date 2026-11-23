@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 
-const CLIENT_ID =
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-  process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
-
-export function GoogleSignInButton({ onSuccess }) {
+export function GoogleSignInButton({ clientId, onSuccess }) {
+  const CLIENT_ID =
+    clientId ||
+    process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+    process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const { googleLogin } = useAuth();
   const containerRef = useRef(null);
   const [ready, setReady] = useState(false);

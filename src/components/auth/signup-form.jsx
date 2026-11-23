@@ -30,7 +30,7 @@ const schema = z
     path: ["confirmPassword"],
   });
 
-export function SignupForm() {
+export function SignupForm({ googleClientId }) {
   const router = useRouter();
   const { user, loading: authLoading, register: registerUser } = useAuth();
   const [serverError, setServerError] = useState("");
@@ -134,7 +134,7 @@ export function SignupForm() {
           </div>
         </div>
 
-        <GoogleSignInButton onSuccess={() => router.replace("/dashboard")} />
+        <GoogleSignInButton clientId={googleClientId} onSuccess={() => router.replace("/dashboard")} />
 
         <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
           Your password is hashed on the server. Sessions are kept in secure, HTTP-only cookies.

@@ -6,7 +6,7 @@ export const metadata = { title: "Create your vault" };
 export default function SignupPage() {
   return (
     <Suspense fallback={<div className="min-h-screen" />}>
-      <SignupForm />
+      <SignupForm googleClientId={process.env.GOOGLE_CLIENT_ID} />
     </Suspense>
   );
 }

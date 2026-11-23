@@ -19,7 +19,7 @@ const schema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export function LoginForm() {
+export function LoginForm({ googleClientId }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading, login } = useAuth();
@@ -110,7 +110,7 @@ export function LoginForm() {
           </div>
         </div>
 
-        <GoogleSignInButton onSuccess={() => router.replace("/dashboard")} />
+        <GoogleSignInButton clientId={googleClientId} onSuccess={() => router.replace("/dashboard")} />
       </form>
     </AuthShell>
   );
