@@ -52,8 +52,9 @@ export function GoogleSignInButton({ clientId, onSuccess }) {
       theme: "filled_black",
       size: "large",
       text: "continue_with",
-      shape: "pill",
-      width: 320,
+      shape: "rectangular",
+      width: containerRef.current.offsetWidth || 320,
+      logo_alignment: "left",
     });
   }, [ready, googleLogin, onSuccess]);
 
@@ -66,9 +67,9 @@ export function GoogleSignInButton({ clientId, onSuccess }) {
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex justify-center overflow-hidden rounded-full">
-        <div ref={containerRef} />
+    <div className="space-y-2 w-full">
+      <div className="flex justify-center w-full">
+        <div ref={containerRef} className="w-full" />
       </div>
       {loading ? (
         <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
