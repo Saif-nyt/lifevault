@@ -92,7 +92,7 @@ export default function ProfilePage() {
                     { icon: CalendarClock, label: "Upcoming reminders", value: data?.upcomingReminders ?? 0, href: "/reminders" },
                     { icon: Sparkles, label: "Collections", value: data?.collections ?? 0, href: "/collections" },
                   ].map((stat) => (
-                    <Link key={stat.label} href={stat.href} className="rounded-lg border border-border p-4 transition hover:bg-secondary/40">
+                    <Link key={stat.label} href={stat.href} className="glass rounded-2xl p-4 transition duration-300 hover:border-primary/30">
                       <stat.icon className="size-4 text-muted-foreground" />
                       <p className="mt-2 font-display text-2xl font-semibold">{stat.value}</p>
                       <p className="text-xs text-muted-foreground">{stat.label}</p>
@@ -127,7 +127,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <div className="rounded-xl border border-border bg-sidebar p-5">
+          <div className="glass rounded-3xl p-5">
             <p className="font-display text-lg font-semibold">Rediscover your own life.</p>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
               The archive gets more valuable the longer you keep it. Add one small thing today.

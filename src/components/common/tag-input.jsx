@@ -34,7 +34,7 @@ export function TagInput({ value = [], onChange, placeholder = "Add a tag and pr
 
   return (
     <div className={cn("space-y-2", className)}>
-      <div className="flex min-h-10 flex-wrap items-center gap-1.5 rounded-lg border border-input bg-card px-2 py-1.5 shadow-sm focus-within:ring-2 focus-within:ring-ring/40">
+      <div className="glass-control flex min-h-10 flex-wrap items-center gap-1.5 rounded-2xl px-2 py-1.5 shadow-inner shadow-black/5 focus-within:ring-2 focus-within:ring-ring/40">
         {value.map((tag) => {
           const name = typeof tag === "object" ? tag.name : tag;
           return (

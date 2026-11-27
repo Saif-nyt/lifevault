@@ -73,7 +73,7 @@ export default function TimelinePage() {
         }
       />
 
-      <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="glass flex flex-col gap-3 rounded-3xl p-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon-sm" onClick={() => setYear((value) => value - 1)} aria-label="Previous year">
             <ChevronLeft />
@@ -170,7 +170,7 @@ export default function TimelinePage() {
                       <Link
                         key={item.id}
                         href={`/archives/${item.id}`}
-                        className="flex items-start gap-3 rounded-lg border border-border bg-card p-3.5 transition hover:border-foreground/20 hover:bg-secondary/30"
+                        className="glass flex items-start gap-3 rounded-2xl p-3.5 transition duration-300 hover:border-primary/25"
                       >
                         <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg", TYPE_CHIPS[item.type])}>
                           <Icon className="size-4" />

@@ -77,7 +77,7 @@ export function AddItemsDialog({ collection, open, onOpenChange, onChanged }) {
               const Icon = type.icon;
               const isIn = existing.has(String(item.id));
               return (
-                <div key={item.id} className="flex items-center gap-3 rounded-lg border border-border p-2.5">
+                <div key={item.id} className="glass flex items-center gap-3 rounded-2xl p-2.5">
                   <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md", TYPE_CHIPS[item.type])}>
                     <Icon className="size-3.5" />
                   </span>
@@ -110,7 +110,7 @@ export function AddItemsDialog({ collection, open, onOpenChange, onChanged }) {
           )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-border pt-3">
+        <div className="flex items-center justify-between border-t border-border/60 pt-3">
           <Badge variant="outline">{added.length} added this session</Badge>
           <Button onClick={() => onOpenChange(false)}>Done</Button>
         </div>

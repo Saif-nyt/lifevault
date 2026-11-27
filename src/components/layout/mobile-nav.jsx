@@ -28,7 +28,7 @@ export function MobileNav() {
         <Plus className="size-6" />
       </Link>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-card/85 backdrop-blur-xl lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/50 bg-background/70 backdrop-blur-2xl lg:hidden">
         <div className="mx-auto flex max-w-md items-stretch justify-around px-2 pb-[env(safe-area-inset-bottom)]">
           {MOBILE_NAV.map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -43,7 +43,7 @@ export function MobileNav() {
               >
                 <span
                   className={cn(
-                    "flex size-8 items-center justify-center rounded-lg transition-colors",
+                    "flex size-9 items-center justify-center rounded-xl transition-colors",
                     active && "bg-primary/15"
                   )}
                 >
@@ -61,7 +61,7 @@ export function MobileNav() {
               moreOpen ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <span className={cn("flex size-8 items-center justify-center rounded-lg", moreOpen && "bg-primary/15")}>
+            <span className={cn("flex size-9 items-center justify-center rounded-xl", moreOpen && "bg-primary/15")}>
               <MoreHorizontal className="size-5" />
             </span>
             More
@@ -75,7 +75,7 @@ export function MobileNav() {
             <DialogTitle>Everything in your vault</DialogTitle>
           </DialogHeader>
 
-          <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-secondary/40 p-3">
+          <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-secondary/50 p-3 backdrop-blur-md">
             <Avatar>
               {user?.avatar ? <AvatarImage src={user.avatar} alt={user.name} /> : null}
               <AvatarFallback>{initials(user?.name)}</AvatarFallback>
@@ -99,7 +99,7 @@ export function MobileNav() {
             <input
               name="q"
               placeholder="Search your archive…"
-              className="h-10 w-full rounded-xl border border-input bg-secondary/40 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
+              className="glass-control h-11 w-full rounded-2xl pl-9 pr-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
             />
           </form>
 

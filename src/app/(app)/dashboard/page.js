@@ -33,7 +33,7 @@ function StatCard({ icon: Icon, label, value, hint, href }) {
   return (
     <Link
       href={href}
-      className="group rounded-2xl border border-border/80 bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_18px_40px_-28px_var(--glow)]"
+      className="group glass rounded-3xl p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_30px_70px_-46px_var(--glow)]"
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</span>
@@ -49,7 +49,7 @@ function StatCard({ icon: Icon, label, value, hint, href }) {
 
 function Panel({ title, meta, action, children, className }) {
   return (
-    <section className={cn("flex flex-col rounded-2xl border border-border/80 bg-card", className)}>
+    <section className={cn("glass flex flex-col rounded-3xl", className)}>
       <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3.5">
         <div className="flex min-w-0 items-center gap-2">
           <h2 className="truncate text-sm font-semibold">{title}</h2>
@@ -144,7 +144,7 @@ export default function DashboardPage() {
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search titles, notes, tags, links…"
           aria-label="Search your archive"
-          className="h-12 w-full rounded-2xl border border-input bg-card/60 pl-11 pr-24 text-sm shadow-inner shadow-black/5 outline-none transition focus:ring-2 focus:ring-ring/40"
+          className="glass-control h-11 w-full rounded-2xl pl-11 pr-24 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring/40"
         />
         <Button type="submit" size="sm" className="absolute right-2 top-1/2 -translate-y-1/2">
           Search

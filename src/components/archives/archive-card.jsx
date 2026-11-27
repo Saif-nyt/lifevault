@@ -17,7 +17,7 @@ export function ArchiveCard({ item, onFavorite, compact = false }) {
   const memoryDate = item.metadata?.memoryDate || item.metadata?.eventDate;
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-card transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_24px_50px_-32px_var(--glow)]">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border/60 bg-card/70 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_24px_60px_-44px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_30px_70px_-44px_var(--glow)]">
       {image && !compact ? (
         <div className="h-36 w-full overflow-hidden bg-muted">
           <img src={image.url} alt="" className="size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
@@ -108,7 +108,7 @@ export function ArchiveListItem({ item, onFavorite }) {
   const type = TYPE_MAP[item.type] || TYPE_MAP.note;
   const Icon = type.icon;
   return (
-    <article className="group relative flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition hover:border-foreground/20">
+    <article className="group relative flex items-center gap-4 rounded-2xl border border-border/60 bg-card/70 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_18px_44px_-36px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-all duration-300 hover:border-primary/30">
       <div className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg", TYPE_CHIPS[item.type])}>
         <Icon className="size-4" />
       </div>

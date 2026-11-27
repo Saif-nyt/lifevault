@@ -55,7 +55,7 @@ export function AddToCollectionDialog({ archiveId, open, onOpenChange }) {
             {data.map((collection) => {
               const contains = (collection.items || []).some((itemId) => String(itemId) === String(archiveId));
               return (
-                <div key={collection.id} className="flex items-center gap-3 rounded-lg border border-border p-3">
+                <div key={collection.id} className="glass flex items-center gap-3 rounded-2xl p-3">
                   <span className="size-2.5 rounded-full" style={{ backgroundColor: collection.color }} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{collection.name}</p>
@@ -81,7 +81,7 @@ export function AddToCollectionDialog({ archiveId, open, onOpenChange }) {
             })}
           </div>
         ) : (
-          <div className="rounded-lg border border-dashed border-border p-6 text-center">
+          <div className="glass rounded-2xl border border-dashed border-border p-6 text-center">
             <FolderHeart className="mx-auto size-5 text-muted-foreground" />
             <p className="mt-2 text-sm text-muted-foreground">No collections yet.</p>
             <Button asChild size="sm" className="mt-3">

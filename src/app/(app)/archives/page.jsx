@@ -100,7 +100,7 @@ function ArchivesContent() {
         }
       />
 
-      <div className="rounded-xl border border-border bg-card p-4">
+      <div className="glass rounded-2xl p-4">
         <div className="flex flex-col gap-3 lg:flex-row">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -197,11 +197,11 @@ function ArchivesContent() {
           <span className="ml-auto hidden items-center gap-1 text-xs text-muted-foreground sm:flex">
             <SlidersHorizontal className="size-3" /> {activeFilters || 0} filter{activeFilters === 1 ? "" : "s"}
           </span>
-          <div className="flex rounded-lg border border-border p-0.5">
+          <div className="flex rounded-2xl border border-border/60 bg-secondary/40 p-0.5 backdrop-blur-md">
             <button
               type="button"
               onClick={() => setView("grid")}
-              className={cn("rounded-md p-1.5", view === "grid" ? "bg-secondary" : "text-muted-foreground")}
+              className={cn("rounded-xl p-1.5", view === "grid" ? "bg-card shadow-sm" : "text-muted-foreground")}
               aria-label="Grid view"
             >
               <LayoutGrid className="size-4" />

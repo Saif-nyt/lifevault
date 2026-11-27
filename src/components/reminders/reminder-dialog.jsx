@@ -24,7 +24,7 @@ import { toDateTimeLocal } from "@/lib/utils";
 const schema = z.object({
   title: z.string().trim().min(1, "Give the reminder a title").max(200),
   note: z.string().max(1000).optional(),
-  remindAt: z.string().min(1, "Choose a date and time"),
+  remindAt: z.string().min(1, "Choose a date and time").optional(),
 });
 
 export function ReminderDialog({ open, onOpenChange, reminder = null, onSaved }) {
@@ -42,7 +42,7 @@ export function ReminderDialog({ open, onOpenChange, reminder = null, onSaved })
     reset({
       title: reminder?.title || "",
       note: reminder?.note || "",
-      remindAt: toDateTimeLocal(reminder?.remindAt) || toDateTimeLocal(new Date(Date.now() + 60 * 60 * 1000)),
+      remindAt: toDateTimeLocal(reminder?.remindAt) || "",
     });
   }, [open, reminder, reset]);
 

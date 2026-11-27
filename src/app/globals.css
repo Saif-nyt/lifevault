@@ -132,13 +132,47 @@
       0 18px 40px -28px rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(12px);
   }
+  .glass {
+    background-color: color-mix(in srgb, var(--card) 66%, transparent);
+    border: 1px solid color-mix(in srgb, var(--foreground) 9%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+      0 24px 60px -44px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+  }
+  .glass-strong {
+    background-color: color-mix(in srgb, var(--card) 78%, transparent);
+    border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+      0 32px 70px -48px rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(34px) saturate(160%);
+    -webkit-backdrop-filter: blur(34px) saturate(160%);
+  }
+  .glass-control {
+    background-color: color-mix(in srgb, var(--secondary) 55%, transparent);
+    border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+      inset 0 -12px 24px -18px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+  }
+  .glass-control:focus-within {
+    border-color: color-mix(in srgb, var(--ring) 55%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+      0 0 0 2px color-mix(in srgb, var(--ring) 30%, transparent);
+  }
   .glow-primary {
     box-shadow: 0 10px 30px -12px var(--glow);
   }
   .app-ambient {
     background:
-      radial-gradient(500px 300px at 90% 0%, color-mix(in srgb, var(--primary) 16%, transparent), transparent 70%),
-      radial-gradient(360px 260px at 8% 8%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 72%);
+      radial-gradient(620px 380px at 88% -12%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
+      radial-gradient(520px 360px at 4% -4%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 72%),
+      radial-gradient(700px 500px at 50% 115%, color-mix(in srgb, var(--primary) 6%, transparent), transparent 70%);
   }
   .hide-scrollbar::-webkit-scrollbar {
     display: none;

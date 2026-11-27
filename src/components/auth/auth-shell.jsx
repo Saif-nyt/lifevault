@@ -4,7 +4,7 @@ import { Archive, ArrowLeft, BookOpen, Lock, Search } from "lucide-react";
 export function AuthShell({ eyebrow, title, subtitle, children, footer }) {
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
-      <div className="relative hidden flex-col justify-between overflow-hidden border-r border-border/60 bg-sidebar p-10 lg:flex">
+      <div className="relative hidden flex-col justify-between overflow-hidden border-r border-border/50 bg-sidebar/70 p-10 backdrop-blur-2xl lg:flex">
         <div className="pointer-events-none absolute -left-24 bottom-0 size-96 rounded-full bg-primary/20 blur-3xl" />
         <div className="pointer-events-none absolute right-10 top-24 size-40 rounded-full bg-gradient-to-br from-primary via-[#7c5cff] to-[#3b22a8] opacity-70 blur-[2px]" />
         <div className="pointer-events-none absolute right-6 top-20 size-56 rounded-full bg-primary/30 blur-3xl" />
@@ -28,7 +28,7 @@ export function AuthShell({ eyebrow, title, subtitle, children, footer }) {
               { icon: Lock, text: "Private by default, scoped to your account" },
             ].map((item) => (
               <div key={item.text} className="flex items-center gap-3 text-sm text-muted-foreground">
-                <span className="flex size-8 items-center justify-center rounded-lg border border-border/70 bg-card">
+                <span className="flex size-8 items-center justify-center rounded-2xl border border-border/60 bg-secondary/50 backdrop-blur-md">
                   <item.icon className="size-3.5" />
                 </span>
                 {item.text}

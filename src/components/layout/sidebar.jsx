@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   Archive,
+  ChevronDown,
   LogOut,
   Moon,
   PanelLeftClose,
@@ -26,7 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { NAV_ITEMS } from "@/lib/constants";
+import { NAV_ITEMS, SECTIONS } from "@/lib/constants";
 import { cn, initials } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { useTheme } from "@/context/theme-context";
@@ -35,6 +36,88 @@ import { useSidebar } from "./sidebar-context";
 
 const MAIN_NAV = NAV_ITEMS.filter((item) => item.href !== "/settings");
 const SETTINGS_ITEM = NAV_ITEMS.find((item) => item.href === "/settings");
+
+const SUBSECTION_TYPES = {
+  "business:business-ideas": "idea",
+  "business:marketing": "note",
+  "business:branding": "note",
+  "business:sales": "note",
+  "business:business-strategy": "note",
+  "business:business-finance": "note",
+  "business:operations": "note",
+  "knowledge:technology": "note",
+  "knowledge:programming": "note",
+  "knowledge:web-development": "note",
+  "knowledge:science": "note",
+  "knowledge:agriculture": "note",
+  "knowledge:education": "note",
+  "knowledge:courses": "note",
+  "knowledge:tutorials": "note",
+  "knowledge:research": "note",
+  "knowledge:study-notes": "note",
+  "knowledge:skills": "note",
+  "knowledge:reference-materials": "note",
+  "personal-life:personal-notes": "note",
+  "personal-life:memories": "memory",
+  "personal-life:goals": "note",
+  "personal-life:future-plans": "note",
+  "personal-life:personal-growth": "note",
+  "personal-life:daily-journal": "note",
+  "personal-life:important-events": "memory",
+  "personal-life:life-lessons": "note",
+  "personal-life:important-documents": "document",
+  "entertainment:movies": "movie",
+  "entertainment:tv-shows": "movie",
+  "entertainment:documentaries": "movie",
+  "entertainment:books": "book",
+  "entertainment:music": "note",
+  "entertainment:youtube-videos": "video",
+  "entertainment:podcasts": "video",
+  "entertainment:other-media": "movie",
+  "ideas-creativity:general-ideas": "idea",
+  "ideas-creativity:creative-ideas": "idea",
+  "ideas-creativity:product-ideas": "idea",
+  "ideas-creativity:app-ideas": "idea",
+  "ideas-creativity:content-ideas": "idea",
+  "ideas-creativity:startup-ideas": "idea",
+  "ideas-creativity:projects": "idea",
+  "ideas-creativity:experiments": "idea",
+  "digital-resources:websites": "link",
+  "digital-resources:tools": "link",
+  "digital-resources:apps": "link",
+  "digital-resources:useful-links": "link",
+  "digital-resources:design-resources": "link",
+  "digital-resources:templates": "note",
+  "digital-resources:software": "link",
+  "digital-resources:online-services": "link",
+  "religion-spirituality:religious-notes": "note",
+  "religion-spirituality:religious-resources": "note",
+  "religion-spirituality:important-references": "note",
+  "religion-spirituality:personal-reflections": "note",
+  "religion-spirituality:learning-materials": "note",
+  "finance:personal-finance": "note",
+  "finance:business-finance": "note",
+  "finance:investments": "note",
+  "finance:budgeting": "note",
+  "finance:financial-notes": "note",
+  "finance:financial-resources": "note",
+  "health-lifestyle:fitness": "note",
+  "health-lifestyle:nutrition": "note",
+  "health-lifestyle:healthy-habits": "note",
+  "health-lifestyle:lifestyle-notes": "note",
+  "health-lifestyle:wellness-resources": "note",
+  "documents-collections:personal-documents": "document",
+  "documents-collections:work-documents": "document",
+  "documents-collections:certificates": "document",
+  "documents-collections:photos": "image",
+  "documents-collections:files": "document",
+  "documents-collections:other-collections": "note",
+};
+
+function subsectionHref(sectionId, subsectionId) {
+  const type = SUBSECTION_TYPES[`${sectionId}:${subsectionId}`];
+  return type ? `/archives?type=${type}` : "/archives";
+}
 
 function isActive(pathname, href) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -48,16 +131,18 @@ function NavLink({ item, active, collapsed, onNavigate }) {
       title={collapsed ? item.label : undefined}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "group flex items-center rounded-xl transition-colors",
-        collapsed ? "justify-center p-1" : "gap-3 px-2 py-1.5",
-        active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+        "group flex items-center rounded-2xl transition-all duration-200",
+        collapsed ? "justify-center p-1.5" : "gap-3 px-2.5 py-2",
+        active
+          ? "bg-primary/15 text-primary shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)]"
+          : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
       )}
     >
       <span
         className={cn(
           "flex size-10 shrink-0 items-center justify-center rounded-xl transition-all",
           active
-            ? "bg-primary text-primary-foreground shadow-[0_12px_28px_-12px_var(--glow)]"
+            ? "bg-primary/15 text-primary shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)]"
             : "group-hover:bg-secondary/70"
         )}
       >
@@ -73,11 +158,21 @@ function NavLink({ item, active, collapsed, onNavigate }) {
 export function Sidebar() {
   const pathname = usePathname();
   const { collapsed, toggle } = useSidebar();
+  const [openSections, setOpenSections] = useState(() => new Set([SECTIONS[0].id]));
+
+  function toggleSection(id) {
+    setOpenSections((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-border/60 bg-sidebar/80 backdrop-blur-xl transition-[width] duration-200 lg:flex",
+        "fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-border/50 bg-sidebar/65 backdrop-blur-2xl transition-[width] duration-200 lg:flex",
         collapsed ? "w-[76px]" : "w-64"
       )}
     >
@@ -111,6 +206,45 @@ export function Sidebar() {
       </div>
 
       <nav className={cn("flex-1 overflow-y-auto py-3", collapsed ? "space-y-1 px-2" : "space-y-0.5 px-3")}>
+        {!collapsed ? (
+          <div className="space-y-0.5 pb-2">
+            {SECTIONS.map((section) => {
+              const Icon = section.icon;
+              const open = openSections.has(section.id);
+              return (
+                <div key={section.id} className="rounded-2xl">
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.id)}
+                    aria-expanded={open}
+                    className={cn(
+                      "flex w-full items-center gap-2.5 rounded-2xl px-2.5 py-2 text-left text-sm transition-colors",
+                      open ? "bg-secondary/60 text-foreground" : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                    )}
+                  >
+                    <Icon className="size-4 shrink-0" />
+                    <span className="min-w-0 flex-1 truncate font-medium">{section.label}</span>
+                    <ChevronDown className={cn("size-4 shrink-0 text-muted-foreground transition-transform duration-200", open && "rotate-180")} />
+                  </button>
+                  {open ? (
+                    <div className="mt-0.5 ml-3 space-y-0.5 border-l border-border/60 pl-2">
+                      {section.subsections.map((sub) => (
+                        <Link
+                          key={sub.id}
+                          href={subsectionHref(section.id, sub.id)}
+                          title={collapsed ? sub.label : undefined}
+                          className="flex items-center rounded-xl px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
         {MAIN_NAV.map((item) => (
           <NavLink
             key={item.href}
@@ -174,7 +308,7 @@ export function Topbar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border/50 bg-background/60 backdrop-blur-2xl">
       <div className="flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:px-8">
         <Link href="/dashboard" className="mr-1 flex items-center gap-2 lg:hidden">
           <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-[#5b34e8] text-white shadow-[0_10px_24px_-12px_var(--glow)]">
@@ -191,7 +325,7 @@ export function Topbar() {
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search your archive…"
             aria-label="Search your archive"
-            className="h-10 w-full rounded-xl border border-input bg-secondary/40 pl-9 pr-16 text-sm outline-none transition focus:ring-2 focus:ring-ring/40"
+            className="glass-control h-11 w-full rounded-2xl pl-11 pr-16 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring/40"
           />
           <kbd className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded-md border border-border bg-card/60 px-1.5 py-0.5 text-[10px] text-muted-foreground sm:block">
             ⌘K

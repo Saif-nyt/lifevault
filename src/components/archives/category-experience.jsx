@@ -101,7 +101,7 @@ export function CategoryExperience({
 
       {firstCategory ? (
         <div
-          className="relative overflow-hidden rounded-xl border border-border p-5"
+          className="relative overflow-hidden rounded-2xl border border-border/60 p-5 backdrop-blur-md"
           style={{ backgroundColor: `${firstCategory.color}14` }}
         >
           <div className="flex flex-wrap items-center justify-between gap-3">

@@ -73,7 +73,7 @@ export function CollectionDialog({ open, onOpenChange, collection = null, onSave
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {serverError ? <p className="rounded-lg bg-destructive/5 p-2 text-sm text-destructive">{serverError}</p> : null}
+          {serverError ? <p className="rounded-xl border border-destructive/30 bg-destructive/5 p-2 text-sm text-destructive">{serverError}</p> : null}
           <div className="space-y-1.5">
             <Label htmlFor="collection-name">Name</Label>
             <Input id="collection-name" placeholder="e.g. Films that changed me" {...register("name")} />

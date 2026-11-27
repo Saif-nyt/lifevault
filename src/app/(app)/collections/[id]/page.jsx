@@ -69,7 +69,7 @@ export default function CollectionDetailPage() {
         </Link>
       </Button>
 
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-8">
+      <div className="glass relative overflow-hidden rounded-3xl border border-border/60 p-6 sm:p-8">
         <div className="absolute inset-x-0 top-0 h-1.5" style={{ backgroundColor: collection.color }} />
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
           <div className="max-w-2xl">
