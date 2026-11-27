@@ -27,7 +27,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { NAV_ITEMS, SECTIONS } from "@/lib/constants";
+import { NAV_ITEMS, SECTIONS, SUBSECTION_CATEGORY_NAMES } from "@/lib/constants";
+import { useApi } from "@/hooks/use-api";
+import { taxonomyService } from "@/services/taxonomy.service";
 import { cn, initials } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { useTheme } from "@/context/theme-context";
@@ -37,86 +39,10 @@ import { useSidebar } from "./sidebar-context";
 const MAIN_NAV = NAV_ITEMS.filter((item) => item.href !== "/settings");
 const SETTINGS_ITEM = NAV_ITEMS.find((item) => item.href === "/settings");
 
-const SUBSECTION_TYPES = {
-  "business:business-ideas": "idea",
-  "business:marketing": "note",
-  "business:branding": "note",
-  "business:sales": "note",
-  "business:business-strategy": "note",
-  "business:business-finance": "note",
-  "business:operations": "note",
-  "knowledge:technology": "note",
-  "knowledge:programming": "note",
-  "knowledge:web-development": "note",
-  "knowledge:science": "note",
-  "knowledge:agriculture": "note",
-  "knowledge:education": "note",
-  "knowledge:courses": "note",
-  "knowledge:tutorials": "note",
-  "knowledge:research": "note",
-  "knowledge:study-notes": "note",
-  "knowledge:skills": "note",
-  "knowledge:reference-materials": "note",
-  "personal-life:personal-notes": "note",
-  "personal-life:memories": "memory",
-  "personal-life:goals": "note",
-  "personal-life:future-plans": "note",
-  "personal-life:personal-growth": "note",
-  "personal-life:daily-journal": "note",
-  "personal-life:important-events": "memory",
-  "personal-life:life-lessons": "note",
-  "personal-life:important-documents": "document",
-  "entertainment:movies": "movie",
-  "entertainment:tv-shows": "movie",
-  "entertainment:documentaries": "movie",
-  "entertainment:books": "book",
-  "entertainment:music": "note",
-  "entertainment:youtube-videos": "video",
-  "entertainment:podcasts": "video",
-  "entertainment:other-media": "movie",
-  "ideas-creativity:general-ideas": "idea",
-  "ideas-creativity:creative-ideas": "idea",
-  "ideas-creativity:product-ideas": "idea",
-  "ideas-creativity:app-ideas": "idea",
-  "ideas-creativity:content-ideas": "idea",
-  "ideas-creativity:startup-ideas": "idea",
-  "ideas-creativity:projects": "idea",
-  "ideas-creativity:experiments": "idea",
-  "digital-resources:websites": "link",
-  "digital-resources:tools": "link",
-  "digital-resources:apps": "link",
-  "digital-resources:useful-links": "link",
-  "digital-resources:design-resources": "link",
-  "digital-resources:templates": "note",
-  "digital-resources:software": "link",
-  "digital-resources:online-services": "link",
-  "religion-spirituality:religious-notes": "note",
-  "religion-spirituality:religious-resources": "note",
-  "religion-spirituality:important-references": "note",
-  "religion-spirituality:personal-reflections": "note",
-  "religion-spirituality:learning-materials": "note",
-  "finance:personal-finance": "note",
-  "finance:business-finance": "note",
-  "finance:investments": "note",
-  "finance:budgeting": "note",
-  "finance:financial-notes": "note",
-  "finance:financial-resources": "note",
-  "health-lifestyle:fitness": "note",
-  "health-lifestyle:nutrition": "note",
-  "health-lifestyle:healthy-habits": "note",
-  "health-lifestyle:lifestyle-notes": "note",
-  "health-lifestyle:wellness-resources": "note",
-  "documents-collections:personal-documents": "document",
-  "documents-collections:work-documents": "document",
-  "documents-collections:certificates": "document",
-  "documents-collections:photos": "image",
-  "documents-collections:files": "document",
-  "documents-collections:other-collections": "note",
-};
-
-function subsectionHref(sectionId, subsectionId) {
-  const type = SUBSECTION_TYPES[`${sectionId}:${subsectionId}`];
-  return type ? `/archives?type=${type}` : "/archives";
+function subsectionHref(sectionId, subsectionId, categoryIdByName) {
+  const categoryName = SUBSECTION_CATEGORY_NAMES[`${sectionId}:${subsectionId}`];
+  const categoryId = categoryIdByName?.get((categoryName || "").toLowerCase());
+  return categoryId ? `/archives?category=${categoryId}` : "/archives";
 }
 
 function isActive(pathname, href) {
@@ -159,6 +85,9 @@ export function Sidebar() {
   const pathname = usePathname();
   const { collapsed, toggle } = useSidebar();
   const [openSections, setOpenSections] = useState(() => new Set([SECTIONS[0].id]));
+  const { data: categories } = useApi(() => taxonomyService.categories(), []);
+
+  const categoryIdByName = new Map((categories || []).map((category) => [category.name.toLowerCase(), category.id]));
 
   function toggleSection(id) {
     setOpenSections((current) => {
@@ -211,6 +140,25 @@ export function Sidebar() {
             {SECTIONS.map((section) => {
               const Icon = section.icon;
               const open = openSections.has(section.id);
+              if (collapsed) {
+                return (
+                  <div key={section.id} className="flex justify-center rounded-2xl">
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(section.id)}
+                      aria-expanded={open}
+                      aria-label={section.label}
+                      title={section.label}
+                      className={cn(
+                        "flex size-10 items-center justify-center rounded-2xl transition-colors",
+                        open ? "bg-secondary/60 text-foreground" : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                      )}
+                    >
+                      <Icon className="size-5" />
+                    </button>
+                  </div>
+                );
+              }
               return (
                 <div key={section.id} className="rounded-2xl">
                   <button
@@ -231,8 +179,8 @@ export function Sidebar() {
                       {section.subsections.map((sub) => (
                         <Link
                           key={sub.id}
-                          href={subsectionHref(section.id, sub.id)}
-                          title={collapsed ? sub.label : undefined}
+                          href={subsectionHref(section.id, sub.id, categoryIdByName)}
+                          title={sub.label}
                           className="flex items-center rounded-xl px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
                         >
                           {sub.label}

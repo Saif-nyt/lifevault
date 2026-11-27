@@ -27,7 +27,7 @@ import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { AddToCollectionDialog } from "@/components/collections/add-to-collection-dialog";
 import { useApi } from "@/hooks/use-api";
 import { archiveService } from "@/services/archive.service";
-import { TYPE_CHIPS, TYPE_MAP } from "@/lib/constants";
+import { SUBSECTION_SECTION_LABELS, TYPE_CHIPS, TYPE_MAP } from "@/lib/constants";
 import { cn, formatDate, formatDateTime, relativeTime } from "@/lib/utils";
 
 const META_LABELS = {
@@ -306,7 +306,11 @@ export default function ArchiveDetailPage() {
               <Separator />
               <div className="flex justify-between gap-3">
                 <span className="text-muted-foreground">Category</span>
-                <span>{archive.category?.name || "Uncategorized"}</span>
+                <span>
+                  {archive.category
+                    ? `${SUBSECTION_SECTION_LABELS[archive.category.name] || "Archive"} / ${archive.category.name}`
+                    : "Uncategorized"}
+                </span>
               </div>
               <Separator />
               <div className="flex justify-between gap-3">

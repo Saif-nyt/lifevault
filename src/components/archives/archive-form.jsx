@@ -22,7 +22,7 @@ import { AttachmentUploader } from "@/components/archives/attachment-uploader";
 import { useApi } from "@/hooks/use-api";
 import { archiveService } from "@/services/archive.service";
 import { taxonomyService } from "@/services/taxonomy.service";
-import { ARCHIVE_TYPES } from "@/lib/constants";
+import { ARCHIVE_TYPES, SUBSECTION_SECTION_LABELS } from "@/lib/constants";
 import { cn, fromDateInput, toDateInput, toDateTimeLocal } from "@/lib/utils";
 
 const schema = z.object({
@@ -42,14 +42,14 @@ const schema = z.object({
 const DATE_FIELDS = new Set(["memoryDate", "eventDate", "takenAt"]);
 const NUMBER_FIELDS = new Set(["rating", "year"]);
 
-function buildDefaults(archive, initialType) {
+function buildDefaults(archive, initialType, initialCategory) {
   const metadata = archive?.metadata || {};
   return {
     title: archive?.title || "",
     description: archive?.description || "",
     content: archive?.content || "",
     type: archive?.type || initialType || "note",
-    category: archive?.category?.id || "",
+    category: archive?.category?.id || initialCategory || "",
     sourceUrl: archive?.sourceUrl || "",
     tags: archive?.tags?.map((tag) => tag.name) || [],
     isFavorite: archive?.isFavorite || false,
@@ -84,7 +84,7 @@ function cleanMetadata(type, metadata = {}) {
   return output;
 }
 
-export function ArchiveForm({ archive = null, initialType = "note" }) {
+export function ArchiveForm({ archive = null, initialType = "note", initialCategory = "" }) {
   const router = useRouter();
   const isEdit = Boolean(archive);
   const [submitError, setSubmitError] = useState("");
@@ -97,7 +97,7 @@ export function ArchiveForm({ archive = null, initialType = "note" }) {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: buildDefaults(archive, initialType),
+    defaultValues: buildDefaults(archive, initialType, initialCategory),
   });
 
   const type = useWatch({ control, name: "type" });
@@ -306,6 +306,14 @@ export function ArchiveForm({ archive = null, initialType = "note" }) {
                     </Select>
                   )}
                 />
+                {(() => {
+                  const selectedCategoryName = (categories || []).find((category) => category.id === field.value)?.name;
+                  return selectedCategoryName ? (
+                    <p className="text-[11px] text-muted-foreground">
+                      {`${SUBSECTION_SECTION_LABELS[selectedCategoryName] || "Archive"} / ${selectedCategoryName}`}
+                    </p>
+                  ) : null;
+                })()}
                 <p className="text-[11px] text-muted-foreground">
                   Manage categories in <Link href="/settings" className="underline underline-offset-2">settings</Link>.
                 </p>

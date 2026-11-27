@@ -18,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useApi, useDebouncedValue } from "@/hooks/use-api";
 import { archiveService } from "@/services/archive.service";
 import { taxonomyService } from "@/services/taxonomy.service";
-import { ARCHIVE_TYPES } from "@/lib/constants";
+import { ARCHIVE_TYPES, SUBSECTION_SECTION_LABELS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const SORTS = [
@@ -66,6 +66,7 @@ function ArchivesContent() {
 
   const activeFilters =
     Boolean(filters.q) + Boolean(filters.type) + Boolean(filters.category) + Boolean(filters.tag) + Boolean(filters.favorite);
+  const activeCategory = filters.category ? categories?.find((category) => category.id === filters.category) : null;
 
   function update(key, value) {
     setFilters((current) => ({ ...current, [key]: value }));
@@ -89,11 +90,15 @@ function ArchivesContent() {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Archive"
-        title="All archives"
-        description="Every note, memory, link and idea you have saved — searchable, filterable and yours."
+        title={activeCategory ? `${SUBSECTION_SECTION_LABELS[activeCategory.name] || "Archive"} / ${activeCategory.name}` : "All archives"}
+        description={
+          activeCategory
+            ? `Everything saved under ${activeCategory.name}.`
+            : "Every note, memory, link and idea you have saved — searchable, filterable and yours."
+        }
         actions={
           <Button asChild>
-            <Link href="/archives/new">
+            <Link href={filters.category ? `/archives/new?category=${filters.category}` : "/archives/new"}>
               <Plus /> New item
             </Link>
           </Button>

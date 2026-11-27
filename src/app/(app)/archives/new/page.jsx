@@ -10,7 +10,8 @@ function NewArchiveContent() {
   const searchParams = useSearchParams();
   const requestedType = searchParams.get("type");
   const initialType = ARCHIVE_TYPES.some((type) => type.value === requestedType) ? requestedType : "note";
-  return <ArchiveForm initialType={initialType} />;
+  const initialCategory = searchParams.get("category") || "";
+  return <ArchiveForm initialType={initialType} initialCategory={initialCategory} />;
 }
 
 export default function NewArchivePage() {
