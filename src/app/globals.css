@@ -181,6 +181,18 @@
   .glow-primary {
     box-shadow: 0 10px 30px -12px var(--glow);
   }
+  .glass-noise {
+    position: relative;
+  }
+  .glass-noise::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    opacity: 0.028;
+    pointer-events: none;
+  }
   .app-ambient {
     background:
       radial-gradient(ellipse 60% 42% at 10% -6%, rgba(84, 139, 255, 0.14), transparent 62%),

@@ -34,6 +34,7 @@ const schema = z.object({
   sourceUrl: z.union([z.string().trim().url("Enter a valid URL"), z.literal("")]).optional(),
   tags: z.array(z.string()).max(20, "Use up to 20 tags").optional(),
   isFavorite: z.boolean().optional(),
+  reminderEnabled: z.boolean().optional(),
   reminderAt: z.string().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
   attachments: z.array(z.record(z.string(), z.unknown())).max(10).optional(),
@@ -53,6 +54,7 @@ function buildDefaults(archive, initialType, initialCategory) {
     sourceUrl: archive?.sourceUrl || "",
     tags: archive?.tags?.map((tag) => tag.name) || [],
     isFavorite: archive?.isFavorite || false,
+    reminderEnabled: Boolean(archive?.reminderAt),
     reminderAt: toDateTimeLocal(archive?.reminderAt),
     metadata: {
       ...metadata,
@@ -103,6 +105,7 @@ export function ArchiveForm({ archive = null, initialType = "note", initialCateg
   const type = useWatch({ control, name: "type" });
   const attachments = useWatch({ control, name: "attachments" });
   const isFavorite = useWatch({ control, name: "isFavorite" });
+  const reminderEnabled = useWatch({ control, name: "reminderEnabled" });
 
   const { data: categories } = useApi(() => taxonomyService.categories(), []);
   const { data: tags } = useApi(() => taxonomyService.tags(), []);
@@ -125,7 +128,7 @@ export function ArchiveForm({ archive = null, initialType = "note", initialCateg
       tags: values.tags || [],
       attachments: values.attachments || [],
       isFavorite: Boolean(values.isFavorite),
-      reminderAt: values.reminderAt ? new Date(values.reminderAt).toISOString() : null,
+      reminderAt: Boolean(values.reminderEnabled) && values.reminderAt ? new Date(values.reminderAt).toISOString() : null,
       metadata: cleanMetadata(values.type, values.metadata),
     };
 
@@ -356,10 +359,37 @@ export function ArchiveForm({ archive = null, initialType = "note", initialCateg
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              <Input type="datetime-local" {...register("reminderAt")} />
-              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Optional. Creates an in-app reminder linked to this item. There is no email or push delivery.
-              </p>
+              <Controller
+                control={control}
+                name="reminderEnabled"
+                render={({ field }) => (
+                  <div className="flex items-center justify-between rounded-xl border border-border p-3">
+                    <div className="flex items-center gap-2">
+                      <Bell className={cn("size-4", field.value ? "fill-current text-primary" : "text-muted-foreground")} />
+                      <div>
+                        <p className="text-sm font-medium">Set a reminder</p>
+                        <p className="text-[11px] leading-relaxed text-muted-foreground">Optional. Creates an in-app reminder linked to this item.</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={Boolean(field.value)}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked);
+                        if (!checked) setValue("reminderAt", "", { shouldDirty: true });
+                      }}
+                    />
+                  </div>
+                )}
+              />
+              {reminderEnabled ? (
+                <Controller
+                  control={control}
+                  name="reminderAt"
+                  render={({ field }) => <Input type="datetime-local" {...field} />}
+                />
+              ) : (
+                <p className="text-[11px] leading-relaxed text-muted-foreground">No reminder set. Enable “Set a reminder” to add one.</p>
+              )}
             </CardContent>
           </Card>
 

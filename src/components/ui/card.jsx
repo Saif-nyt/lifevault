@@ -4,7 +4,7 @@ function Card({ className, ...props }) {
   return (
     <div
       className={cn(
-        "glass rounded-3xl text-card-foreground",
+        "glass glass-noise relative rounded-3xl text-card-foreground",
         className
       )}
       {...props}
