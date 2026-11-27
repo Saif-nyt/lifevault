@@ -27,7 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { NAV_ITEMS, SECTIONS, SUBSECTION_CATEGORY_NAMES } from "@/lib/constants";
+import { CATEGORY_TO_SECTION, NAV_ITEMS, SECTIONS, SUBSECTION_CATEGORY_NAMES, getSectionAccent } from "@/lib/constants";
 import { useApi } from "@/hooks/use-api";
 import { taxonomyService } from "@/services/taxonomy.service";
 import { cn, initials } from "@/lib/utils";
@@ -140,6 +140,7 @@ export function Sidebar() {
             {SECTIONS.map((section) => {
               const Icon = section.icon;
               const open = openSections.has(section.id);
+              const accent = getSectionAccent(section.id);
               if (collapsed) {
                 return (
                   <div key={section.id} className="flex justify-center rounded-2xl">
@@ -151,10 +152,11 @@ export function Sidebar() {
                       title={section.label}
                       className={cn(
                         "flex size-10 items-center justify-center rounded-2xl transition-colors",
-                        open ? "bg-secondary/60 text-foreground" : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                        open ? "bg-secondary/60" : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
                       )}
+                      style={accent ? { color: open ? accent.hex : undefined } : undefined}
                     >
-                      <Icon className="size-5" />
+                      <Icon className="size-5" style={accent ? { color: open ? accent.hex : undefined } : undefined} />
                     </button>
                   </div>
                 );
@@ -167,10 +169,11 @@ export function Sidebar() {
                     aria-expanded={open}
                     className={cn(
                       "flex w-full items-center gap-2.5 rounded-2xl px-2.5 py-2 text-left text-sm transition-colors",
-                      open ? "bg-secondary/60 text-foreground" : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                      open ? "bg-secondary/60" : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                     )}
+                    style={accent ? { color: open ? accent.hex : undefined } : undefined}
                   >
-                    <Icon className="size-4 shrink-0" />
+                    <Icon className="size-4 shrink-0" style={accent ? { color: open ? accent.hex : undefined } : undefined} />
                     <span className="min-w-0 flex-1 truncate font-medium">{section.label}</span>
                     <ChevronDown className={cn("size-4 shrink-0 text-muted-foreground transition-transform duration-200", open && "rotate-180")} />
                   </button>

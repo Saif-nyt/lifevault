@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Bookmark, Clock, Paperclip } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TYPE_CHIPS, TYPE_MAP } from "@/lib/constants";
+import { CATEGORY_TO_SECTION, SECTION_ACCENTS, TYPE_CHIPS, TYPE_MAP } from "@/lib/constants";
 import { cn, formatDate, truncate } from "@/lib/utils";
 
 export function ArchiveCard({ item, onFavorite, compact = false }) {
@@ -15,6 +15,8 @@ export function ArchiveCard({ item, onFavorite, compact = false }) {
     (attachment) => attachment.resourceType === "image" || /\.(png|jpe?g|webp|gif)$/i.test(attachment.url)
   );
   const memoryDate = item.metadata?.memoryDate || item.metadata?.eventDate;
+  const sectionId = item.category?.name ? CATEGORY_TO_SECTION[item.category.name] : null;
+  const accent = sectionId ? SECTION_ACCENTS[sectionId] : null;
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-border/60 bg-card/70 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_24px_60px_-44px_rgba(0,0,0,0.8)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_30px_70px_-44px_var(--glow)]">
@@ -62,7 +64,7 @@ export function ArchiveCard({ item, onFavorite, compact = false }) {
 
         {item.category ? (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="size-2 rounded-full" style={{ backgroundColor: item.category.color }} />
+            <span className="size-2 rounded-full" style={{ backgroundColor: accent?.hex || item.category.color }} />
             {item.category.name}
           </div>
         ) : null}

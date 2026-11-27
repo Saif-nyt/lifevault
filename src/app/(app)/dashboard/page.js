@@ -29,7 +29,8 @@ import { archiveService } from "@/services/archive.service";
 import { TYPE_CHIPS, TYPE_MAP } from "@/lib/constants";
 import { cn, formatDate, formatDateTime, relativeTime } from "@/lib/utils";
 
-function StatCard({ icon: Icon, label, value, hint, href }) {
+function StatCard({ icon: Icon, label, value, hint, href, accent }) {
+  const accentHex = accent?.hex;
   return (
     <Link
       href={href}
@@ -37,7 +38,10 @@ function StatCard({ icon: Icon, label, value, hint, href }) {
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</span>
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+        <span
+          className="flex size-8 shrink-0 items-center justify-center rounded-xl transition-all duration-300"
+          style={accentHex ? { backgroundColor: accent.soft, color: accentHex } : { backgroundColor: "color-mix(in srgb, var(--primary) 10%, transparent)", color: "var(--primary)" }}
+        >
           <Icon className="size-4" />
         </span>
       </div>
@@ -171,10 +175,10 @@ export default function DashboardPage() {
       {!loading && data ? (
         <>
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            <StatCard icon={Layers} label="Archived items" value={data.stats.totalItems} hint="Everything you have saved" href="/archives" />
-            <StatCard icon={Bookmark} label="Favorites" value={data.stats.favorites} hint="Kept close" href="/favorites" />
-            <StatCard icon={CalendarClock} label="Upcoming" value={data.stats.upcomingReminders} hint="Reminders ahead" href="/reminders" />
-            <StatCard icon={FolderHeart} label="Collections" value={data.stats.collections} hint="Curated groups" href="/collections" />
+            <StatCard icon={Layers} label="Archived items" value={data.stats.totalItems} hint="Everything you have saved" href="/archives" accent={{ hex: "#548BFF", soft: "rgba(84, 139, 255, 0.14)" }} />
+            <StatCard icon={Bookmark} label="Favorites" value={data.stats.favorites} hint="Kept close" href="/favorites" accent={{ hex: "#E99BC2", soft: "rgba(233, 155, 194, 0.13)" }} />
+            <StatCard icon={CalendarClock} label="Upcoming" value={data.stats.upcomingReminders} hint="Reminders ahead" href="/reminders" accent={{ hex: "#42D6D0", soft: "rgba(66, 214, 208, 0.13)" }} />
+            <StatCard icon={FolderHeart} label="Collections" value={data.stats.collections} hint="Curated groups" href="/collections" accent={{ hex: "#A78BFA", soft: "rgba(167, 139, 250, 0.14)" }} />
           </div>
 
           <div className="grid gap-4 xl:grid-cols-3">

@@ -273,6 +273,33 @@ export const SUBSECTION_SECTION_LABELS = Object.fromEntries(
   ])
 );
 
+/**
+ * Midnight Aurora section accent system — one restrained accent per main
+ * section. Tints are used for icon containers, active navigation, small
+ * indicators and subtle card highlights; never as full-surface backgrounds.
+ */
+export const SECTION_ACCENTS = {
+  business: { hex: "#548BFF", soft: "rgba(84, 139, 255, 0.14)", name: "Electric Blue" },
+  knowledge: { hex: "#42D6D0", soft: "rgba(66, 214, 208, 0.13)", name: "Aurora Cyan" },
+  "personal-life": { hex: "#E99BC2", soft: "rgba(233, 155, 194, 0.13)", name: "Rose" },
+  entertainment: { hex: "#A78BFA", soft: "rgba(167, 139, 250, 0.14)", name: "Violet" },
+  "ideas-creativity": { hex: "#FFB86B", soft: "rgba(255, 184, 107, 0.13)", name: "Amber" },
+  "digital-resources": { hex: "#818CF8", soft: "rgba(129, 140, 248, 0.14)", name: "Indigo" },
+  "religion-spirituality": { hex: "#C4A7FF", soft: "rgba(196, 167, 255, 0.14)", name: "Lavender" },
+  finance: { hex: "#48C99A", soft: "rgba(72, 201, 154, 0.13)", name: "Emerald" },
+  "health-lifestyle": { hex: "#8BCF91", soft: "rgba(139, 207, 145, 0.13)", name: "Fresh Green" },
+  "documents-collections": { hex: "#80A9D8", soft: "rgba(128, 169, 216, 0.14)", name: "Steel Blue" },
+};
+
+export function getSectionAccent(sectionId) {
+  return SECTION_ACCENTS[sectionId] || null;
+}
+
+/** Reverse lookup: user category name → owning main section id. */
+export const CATEGORY_TO_SECTION = Object.fromEntries(
+  Object.entries(SUBSECTION_CATEGORY_NAMES).map(([key, categoryName]) => [categoryName, key.split(":")[0]])
+);
+
 export const MOBILE_NAV = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/archives", label: "Archives", icon: Layers },

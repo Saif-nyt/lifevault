@@ -30,29 +30,30 @@
 }
 
 .dark {
-  --background: #08070d;
-  --foreground: #f2f0fa;
-  --card: #111019;
-  --card-foreground: #f2f0fa;
-  --popover: #15131f;
-  --popover-foreground: #f2f0fa;
-  --primary: #7c5cff;
+  /* Midnight Aurora — deep navy base with elevated glass surfaces */
+  --background: #0a1020;
+  --foreground: #f5f7ff;
+  --card: #17243a;
+  --card-foreground: #f5f7ff;
+  --popover: #17243a;
+  --popover-foreground: #f5f7ff;
+  --primary: #548bff;
   --primary-foreground: #ffffff;
-  --secondary: #1a1826;
-  --secondary-foreground: #ecebf5;
-  --muted: #16141f;
-  --muted-foreground: #8f8ba3;
-  --accent: #241f3a;
-  --accent-foreground: #ddd6ff;
-  --destructive: #f26d6d;
-  --destructive-foreground: #1a0b0b;
-  --success: #4ade80;
-  --success-foreground: #052e16;
-  --border: #242032;
-  --input: #2a263a;
-  --ring: #8b6cff;
-  --sidebar: #0b0a11;
-  --glow: rgba(124, 92, 255, 0.45);
+  --secondary: #101a2d;
+  --secondary-foreground: #b3bed1;
+  --muted: #0d1628;
+  --muted-foreground: #8291aa;
+  --accent: #1a2740;
+  --accent-foreground: #c9d6ee;
+  --destructive: #ff8585;
+  --destructive-foreground: #140a12;
+  --success: #48c99a;
+  --success-foreground: #04160d;
+  --border: #22314f;
+  --input: #2a3a58;
+  --ring: #548bff;
+  --sidebar: #0d1628;
+  --glow: rgba(84, 139, 255, 0.45);
 }
 
 @theme inline {
@@ -103,8 +104,9 @@
   body {
     background-color: var(--background);
     background-image:
-      radial-gradient(900px 520px at 88% -12%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 70%),
-      radial-gradient(720px 420px at 4% -4%, color-mix(in srgb, var(--primary) 7%, transparent), transparent 72%);
+      radial-gradient(ellipse 60% 42% at 10% -6%, rgba(84, 139, 255, 0.14), transparent 62%),
+      radial-gradient(ellipse 52% 38% at 92% 4%, rgba(167, 139, 250, 0.12), transparent 60%),
+      radial-gradient(ellipse 55% 42% at 50% 108%, rgba(66, 214, 208, 0.07), transparent 65%);
     background-attachment: fixed;
     color: var(--foreground);
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
@@ -132,23 +134,34 @@
       0 18px 40px -28px rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(12px);
   }
-  .glass {
-    background-color: color-mix(in srgb, var(--card) 66%, transparent);
+  .glass,
+  .glass-primary {
+    background-color: color-mix(in srgb, var(--card) 68%, transparent);
+    border: 1px solid color-mix(in srgb, var(--foreground) 11%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.09),
+      0 12px 40px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+  }
+  .glass-secondary {
+    background-color: color-mix(in srgb, var(--card) 48%, transparent);
     border: 1px solid color-mix(in srgb, var(--foreground) 9%, transparent);
     box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
-      0 24px 60px -44px rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(22px) saturate(150%);
-    -webkit-backdrop-filter: blur(22px) saturate(150%);
-  }
-  .glass-strong {
-    background-color: color-mix(in srgb, var(--card) 78%, transparent);
-    border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
-    box-shadow:
       inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-      0 32px 70px -48px rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(34px) saturate(160%);
-    -webkit-backdrop-filter: blur(34px) saturate(160%);
+      0 8px 24px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+  }
+  .glass-floating,
+  .glass-strong {
+    background-color: color-mix(in srgb, var(--card) 86%, transparent);
+    border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.1),
+      0 20px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(30px) saturate(160%);
+    -webkit-backdrop-filter: blur(30px) saturate(160%);
   }
   .glass-control {
     background-color: color-mix(in srgb, var(--secondary) 55%, transparent);
@@ -170,9 +183,10 @@
   }
   .app-ambient {
     background:
-      radial-gradient(620px 380px at 88% -12%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 70%),
-      radial-gradient(520px 360px at 4% -4%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 72%),
-      radial-gradient(700px 500px at 50% 115%, color-mix(in srgb, var(--primary) 6%, transparent), transparent 70%);
+      radial-gradient(ellipse 60% 42% at 10% -6%, rgba(84, 139, 255, 0.14), transparent 62%),
+      radial-gradient(ellipse 52% 38% at 92% 4%, rgba(167, 139, 250, 0.12), transparent 60%),
+      radial-gradient(ellipse 55% 42% at 50% 108%, rgba(66, 214, 208, 0.07), transparent 65%),
+      var(--background);
   }
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
@@ -194,6 +208,28 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-primary,
+  .glass-secondary,
+  .glass-floating,
+  .glass-strong,
+  .glass-control {
+    background-color: color-mix(in srgb, var(--card) 92%, transparent);
   }
 }
 
