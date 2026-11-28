@@ -18,7 +18,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useApi, useDebouncedValue } from "@/hooks/use-api";
 import { archiveService } from "@/services/archive.service";
 import { taxonomyService } from "@/services/taxonomy.service";
-import { ARCHIVE_TYPES, SUBSECTION_SECTION_LABELS } from "@/lib/constants";
+import {
+  ARCHIVE_TYPES,
+  SUBSECTION_SECTION_LABELS,
+  getSectionIdForCategoryName,
+  getSubcategoriesForSection,
+  getSubcategoryMeta,
+} from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const SORTS = [
@@ -34,6 +40,7 @@ function ArchivesContent() {
     q: searchParams.get("q") || "",
     type: searchParams.get("type") || "",
     category: searchParams.get("category") || "",
+    subcategory: searchParams.get("subcategory") || "",
     tag: searchParams.get("tag") || "",
     favorite: searchParams.get("favorite") === "true" ? "true" : "",
     sort: searchParams.get("sort") || "newest",
@@ -53,28 +60,61 @@ function ArchivesContent() {
         q: debouncedQuery || undefined,
         type: filters.type || undefined,
         category: filters.category || undefined,
+        subcategory: filters.subcategory || undefined,
         tag: filters.tag || undefined,
         favorite: filters.favorite || undefined,
         sort: filters.sort,
       }),
-    [debouncedQuery, filters.type, filters.category, filters.tag, filters.favorite, filters.sort, page]
+    [debouncedQuery, filters.type, filters.category, filters.subcategory, filters.tag, filters.favorite, filters.sort, page]
   );
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedQuery, filters.type, filters.category, filters.tag, filters.favorite, filters.sort]);
+  }, [debouncedQuery, filters.type, filters.category, filters.subcategory, filters.tag, filters.favorite, filters.sort]);
 
   const activeFilters =
-    Boolean(filters.q) + Boolean(filters.type) + Boolean(filters.category) + Boolean(filters.tag) + Boolean(filters.favorite);
+    Boolean(filters.q) +
+    Boolean(filters.type) +
+    Boolean(filters.category) +
+    Boolean(filters.subcategory) +
+    Boolean(filters.tag) +
+    Boolean(filters.favorite);
   const activeCategory = filters.category ? categories?.find((category) => category.id === filters.category) : null;
+  const subcategoryMeta = getSubcategoryMeta(filters.subcategory);
+  const subcategorySectionId =
+    subcategoryMeta?.sectionId || (activeCategory ? getSectionIdForCategoryName(activeCategory.name) : null);
+  const subcategoryOptions = getSubcategoriesForSection(subcategorySectionId);
 
   function update(key, value) {
     setFilters((current) => ({ ...current, [key]: value }));
   }
 
-  function clearFilters() {
-    setFilters({ q: "", type: "", category: "", tag: "", favorite: "", sort: "newest" });
+  function updateCategory(value) {
+    const nextId = value === "all" ? "" : value;
+    setFilters((current) => {
+      const nextCategory = (categories || []).find((category) => category.id === nextId);
+      const allowed = getSubcategoriesForSection(getSectionIdForCategoryName(nextCategory?.name)).map(
+        (option) => option.value
+      );
+      return {
+        ...current,
+        category: nextId,
+        subcategory: current.subcategory && allowed.includes(current.subcategory) ? current.subcategory : "",
+      };
+    });
   }
+
+  function clearFilters() {
+    setFilters({ q: "", type: "", category: "", subcategory: "", tag: "", favorite: "", sort: "newest" });
+  }
+
+  const newItemHref = filters.subcategory
+    ? `/archives/new?subcategory=${encodeURIComponent(filters.subcategory)}${
+        filters.category ? `&category=${filters.category}` : ""
+      }`
+    : filters.category
+      ? `/archives/new?category=${filters.category}`
+      : "/archives/new";
 
   async function handleFavorite(item) {
     try {
@@ -90,15 +130,23 @@ function ArchivesContent() {
     <div className="space-y-6">
       <PageHeader
         eyebrow="Archive"
-        title={activeCategory ? `${SUBSECTION_SECTION_LABELS[activeCategory.name] || "Archive"} / ${activeCategory.name}` : "All archives"}
+        title={
+          subcategoryMeta
+            ? `${subcategoryMeta.sectionLabel} / ${subcategoryMeta.label}`
+            : activeCategory
+              ? `${SUBSECTION_SECTION_LABELS[activeCategory.name] || "Archive"} / ${activeCategory.name}`
+              : "All archives"
+        }
         description={
-          activeCategory
-            ? `Everything saved under ${activeCategory.name}.`
-            : "Every note, memory, link and idea you have saved — searchable, filterable and yours."
+          subcategoryMeta
+            ? `Everything saved under ${subcategoryMeta.label}${activeCategory ? ` in ${activeCategory.name}` : ""}.`
+            : activeCategory
+              ? `Everything saved under ${activeCategory.name}.`
+              : "Every note, memory, link and idea you have saved — searchable, filterable and yours."
         }
         actions={
           <Button asChild>
-            <Link href={filters.category ? `/archives/new?category=${filters.category}` : "/archives/new"}>
+            <Link href={newItemHref}>
               <Plus /> New item
             </Link>
           </Button>
@@ -142,8 +190,8 @@ function ArchivesContent() {
               </SelectContent>
             </Select>
 
-            <Select value={filters.category || "all"} onValueChange={(value) => update("category", value === "all" ? "" : value)}>
-              <SelectTrigger className="min-w-32">
+            <Select value={filters.category || "all"} onValueChange={updateCategory}>
+              <SelectTrigger className="min-w-32" aria-label="Category">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
@@ -155,6 +203,25 @@ function ArchivesContent() {
                 ))}
               </SelectContent>
             </Select>
+
+            {subcategoryOptions.length ? (
+              <Select
+                value={filters.subcategory || "all"}
+                onValueChange={(value) => update("subcategory", value === "all" ? "" : value)}
+              >
+                <SelectTrigger className="min-w-32" aria-label="Subcategory">
+                  <SelectValue placeholder="Subcategory" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All subcategories</SelectItem>
+                  {subcategoryOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : null}
 
             <Select value={filters.tag || "all"} onValueChange={(value) => update("tag", value === "all" ? "" : value)}>
               <SelectTrigger className="min-w-28">
@@ -269,6 +336,9 @@ function ArchivesContent() {
           {filters.type ? <Badge variant="secondary">{filters.type}</Badge> : null}
           {filters.category ? (
             <Badge variant="secondary">{categories?.find((category) => category.id === filters.category)?.name || "Category"}</Badge>
+          ) : null}
+          {filters.subcategory ? (
+            <Badge variant="secondary">{subcategoryMeta?.label || "Subcategory"}</Badge>
           ) : null}
           {filters.tag ? <Badge variant="secondary">#{filters.tag}</Badge> : null}
           {filters.favorite ? <Badge variant="secondary">Favorites</Badge> : null}

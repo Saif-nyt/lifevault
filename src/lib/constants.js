@@ -300,6 +300,93 @@ export const CATEGORY_TO_SECTION = Object.fromEntries(
   Object.entries(SUBSECTION_CATEGORY_NAMES).map(([key, categoryName]) => [categoryName, key.split(":")[0]])
 );
 
+/** Stable identity for a taxonomy subcategory, e.g. "business:marketing". */
+export function subcategoryKey(sectionId, subsectionId) {
+  return `${sectionId}:${subsectionId}`;
+}
+
+/** Every known subcategory, keyed by its stable identity. */
+export const SUBCATEGORY_INDEX = Object.fromEntries(
+  SECTIONS.flatMap((section) =>
+    section.subsections.map((subsection) => [
+      subcategoryKey(section.id, subsection.id),
+      {
+        value: subcategoryKey(section.id, subsection.id),
+        id: subsection.id,
+        label: subsection.label,
+        sectionId: section.id,
+        sectionLabel: section.label,
+      },
+    ])
+  )
+);
+
+/**
+ * Main-section aliases for the category names users actually own. Extends the
+ * curated subsection map above, so the default archive categories (Business,
+ * Learning, …) also resolve to a section and therefore expose subcategories.
+ */
+const CATEGORY_SECTION_ALIASES = {
+  business: "business",
+  entertainment: "entertainment",
+  knowledge: "knowledge",
+  "knowledge & learning": "knowledge",
+  learning: "knowledge",
+  research: "knowledge",
+  "personal life": "personal-life",
+  personal: "personal-life",
+  ideas: "ideas-creativity",
+  "ideas & creativity": "ideas-creativity",
+  spiritual: "religion-spirituality",
+  "religion & spirituality": "religion-spirituality",
+  finance: "finance",
+  "health & lifestyle": "health-lifestyle",
+  "digital resources": "digital-resources",
+  "documents & collections": "documents-collections",
+};
+
+/** Category name (case-insensitive) → owning main section id, or null. */
+export const CATEGORY_NAME_TO_SECTION = (() => {
+  const map = { ...CATEGORY_SECTION_ALIASES };
+  for (const [categoryName, sectionId] of Object.entries(CATEGORY_TO_SECTION)) {
+    map[categoryName.toLowerCase()] = sectionId;
+  }
+  return map;
+})();
+
+export function getSectionIdForCategoryName(name) {
+  if (!name) return null;
+  const key = String(name).trim().toLowerCase();
+  if (CATEGORY_NAME_TO_SECTION[key]) return CATEGORY_NAME_TO_SECTION[key];
+  const section = SECTIONS.find((item) => item.id === key || item.label.toLowerCase() === key);
+  return section ? section.id : null;
+}
+
+/** Subcategories available for a main section (empty array when none). */
+export function getSubcategoriesForSection(sectionId) {
+  if (!sectionId) return [];
+  const section = SECTIONS.find((item) => item.id === sectionId);
+  if (!section) return [];
+  return section.subsections.map((subsection) => SUBCATEGORY_INDEX[subcategoryKey(section.id, subsection.id)]);
+}
+
+/** Subcategories available for a user category name (empty array when none). */
+export function getSubcategoriesForCategoryName(name) {
+  return getSubcategoriesForSection(getSectionIdForCategoryName(name));
+}
+
+export function getSubcategoryMeta(value) {
+  return value ? SUBCATEGORY_INDEX[value] || null : null;
+}
+
+export function getSectionIdForSubcategory(value) {
+  return getSubcategoryMeta(value)?.sectionId || null;
+}
+
+export function getSubcategoryLabel(value) {
+  return getSubcategoryMeta(value)?.label || "";
+}
+
 export const MOBILE_NAV = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/archives", label: "Archives", icon: Layers },

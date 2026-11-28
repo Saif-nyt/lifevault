@@ -27,9 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CATEGORY_TO_SECTION, NAV_ITEMS, SECTIONS, SUBSECTION_CATEGORY_NAMES, getSectionAccent } from "@/lib/constants";
-import { useApi } from "@/hooks/use-api";
-import { taxonomyService } from "@/services/taxonomy.service";
+import { NAV_ITEMS, SECTIONS, getSectionAccent, subcategoryKey } from "@/lib/constants";
 import { cn, initials } from "@/lib/utils";
 import { useAuth } from "@/context/auth-context";
 import { useTheme } from "@/context/theme-context";
@@ -39,10 +37,8 @@ import { useSidebar } from "./sidebar-context";
 const MAIN_NAV = NAV_ITEMS.filter((item) => item.href !== "/settings");
 const SETTINGS_ITEM = NAV_ITEMS.find((item) => item.href === "/settings");
 
-function subsectionHref(sectionId, subsectionId, categoryIdByName) {
-  const categoryName = SUBSECTION_CATEGORY_NAMES[`${sectionId}:${subsectionId}`];
-  const categoryId = categoryIdByName?.get((categoryName || "").toLowerCase());
-  return categoryId ? `/archives?category=${categoryId}` : "/archives";
+function subsectionHref(sectionId, subsectionId) {
+  return `/archives?subcategory=${encodeURIComponent(subcategoryKey(sectionId, subsectionId))}`;
 }
 
 function isActive(pathname, href) {
@@ -85,9 +81,6 @@ export function Sidebar() {
   const pathname = usePathname();
   const { collapsed, toggle } = useSidebar();
   const [openSections, setOpenSections] = useState(() => new Set([SECTIONS[0].id]));
-  const { data: categories } = useApi(() => taxonomyService.categories(), []);
-
-  const categoryIdByName = new Map((categories || []).map((category) => [category.name.toLowerCase(), category.id]));
 
   function toggleSection(id) {
     setOpenSections((current) => {
@@ -182,7 +175,7 @@ export function Sidebar() {
                       {section.subsections.map((sub) => (
                         <Link
                           key={sub.id}
-                          href={subsectionHref(section.id, sub.id, categoryIdByName)}
+                          href={subsectionHref(section.id, sub.id)}
                           title={sub.label}
                           className="flex items-center rounded-xl px-2.5 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
                         >

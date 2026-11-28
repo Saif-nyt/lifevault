@@ -27,7 +27,7 @@ import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { AddToCollectionDialog } from "@/components/collections/add-to-collection-dialog";
 import { useApi } from "@/hooks/use-api";
 import { archiveService } from "@/services/archive.service";
-import { SUBSECTION_SECTION_LABELS, TYPE_CHIPS, TYPE_MAP } from "@/lib/constants";
+import { SUBSECTION_SECTION_LABELS, TYPE_CHIPS, TYPE_MAP, getSubcategoryLabel } from "@/lib/constants";
 import { cn, formatDate, formatDateTime, relativeTime } from "@/lib/utils";
 
 const META_LABELS = {
@@ -166,6 +166,7 @@ export default function ArchiveDetailPage() {
               {archive.category.name}
             </Badge>
           ) : null}
+          {archive.subcategory ? <Badge variant="outline">{getSubcategoryLabel(archive.subcategory)}</Badge> : null}
           {archive.isFavorite ? <Badge variant="secondary">Favorite</Badge> : null}
         </div>
         <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">{archive.title}</h1>
@@ -312,6 +313,15 @@ export default function ArchiveDetailPage() {
                     : "Uncategorized"}
                 </span>
               </div>
+              {archive.subcategory ? (
+                <>
+                  <Separator />
+                  <div className="flex justify-between gap-3">
+                    <span className="text-muted-foreground">Subcategory</span>
+                    <span>{getSubcategoryLabel(archive.subcategory) || "—"}</span>
+                  </div>
+                </>
+              ) : null}
               <Separator />
               <div className="flex justify-between gap-3">
                 <span className="text-muted-foreground">Saved</span>

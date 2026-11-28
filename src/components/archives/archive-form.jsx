@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,7 +22,14 @@ import { AttachmentUploader } from "@/components/archives/attachment-uploader";
 import { useApi } from "@/hooks/use-api";
 import { archiveService } from "@/services/archive.service";
 import { taxonomyService } from "@/services/taxonomy.service";
-import { ARCHIVE_TYPES, SUBSECTION_SECTION_LABELS } from "@/lib/constants";
+import {
+  ARCHIVE_TYPES,
+  SUBSECTION_SECTION_LABELS,
+  getSectionIdForCategoryName,
+  getSectionIdForSubcategory,
+  getSubcategoriesForCategoryName,
+  getSubcategoryMeta,
+} from "@/lib/constants";
 import { cn, fromDateInput, toDateInput, toDateTimeLocal } from "@/lib/utils";
 
 const schema = z.object({
@@ -31,6 +38,7 @@ const schema = z.object({
   content: z.string().max(100000).optional(),
   type: z.enum(ARCHIVE_TYPES.map((type) => type.value)),
   category: z.string().optional(),
+  subcategory: z.string().max(120).optional(),
   sourceUrl: z.union([z.string().trim().url("Enter a valid URL"), z.literal("")]).optional(),
   tags: z.array(z.string()).max(20, "Use up to 20 tags").optional(),
   isFavorite: z.boolean().optional(),
@@ -43,7 +51,7 @@ const schema = z.object({
 const DATE_FIELDS = new Set(["memoryDate", "eventDate", "takenAt"]);
 const NUMBER_FIELDS = new Set(["rating", "year"]);
 
-function buildDefaults(archive, initialType, initialCategory) {
+function buildDefaults(archive, initialType, initialCategory, initialSubcategory) {
   const metadata = archive?.metadata || {};
   return {
     title: archive?.title || "",
@@ -51,6 +59,7 @@ function buildDefaults(archive, initialType, initialCategory) {
     content: archive?.content || "",
     type: archive?.type || initialType || "note",
     category: archive?.category?.id || initialCategory || "",
+    subcategory: archive?.subcategory || initialSubcategory || "",
     sourceUrl: archive?.sourceUrl || "",
     tags: archive?.tags?.map((tag) => tag.name) || [],
     isFavorite: archive?.isFavorite || false,
@@ -77,6 +86,7 @@ function cleanMetadata(type, metadata = {}) {
       return;
     }
     if (NUMBER_FIELDS.has(key)) {
+      if (value === "" || value === null || value === undefined) return;
       const number = Number(value);
       if (!Number.isNaN(number)) output[key] = number;
       return;
@@ -86,7 +96,7 @@ function cleanMetadata(type, metadata = {}) {
   return output;
 }
 
-export function ArchiveForm({ archive = null, initialType = "note", initialCategory = "" }) {
+export function ArchiveForm({ archive = null, initialType = "note", initialCategory = "", initialSubcategory = "" }) {
   const router = useRouter();
   const isEdit = Boolean(archive);
   const [submitError, setSubmitError] = useState("");
@@ -96,13 +106,17 @@ export function ArchiveForm({ archive = null, initialType = "note", initialCateg
     handleSubmit,
     control,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: buildDefaults(archive, initialType, initialCategory),
+    defaultValues: buildDefaults(archive, initialType, initialCategory, initialSubcategory),
   });
 
   const type = useWatch({ control, name: "type" });
+  const categoryId = useWatch({ control, name: "category" });
+  const subcategory = useWatch({ control, name: "subcategory" });
   const attachments = useWatch({ control, name: "attachments" });
   const isFavorite = useWatch({ control, name: "isFavorite" });
   const reminderEnabled = useWatch({ control, name: "reminderEnabled" });
@@ -110,20 +124,60 @@ export function ArchiveForm({ archive = null, initialType = "note", initialCateg
   const { data: categories } = useApi(() => taxonomyService.categories(), []);
   const { data: tags } = useApi(() => taxonomyService.tags(), []);
 
+  const selectedCategory = (categories || []).find((category) => category.id === categoryId) || null;
+  const subcategoryOptions = getSubcategoriesForCategoryName(selectedCategory?.name);
+  const selectedSubcategory = getSubcategoryMeta(subcategory);
+
+  // When arriving from a subcategory link (e.g. /archives/new?subcategory=business:marketing)
+  // pre-select a matching parent category once the user's categories have loaded.
+  useEffect(() => {
+    if (isEdit || !initialSubcategory || categoryId) return;
+    const sectionId = getSectionIdForSubcategory(initialSubcategory);
+    if (!sectionId) return;
+    const parent = (categories || []).find(
+      (category) => getSectionIdForCategoryName(category.name) === sectionId
+    );
+    if (parent) setValue("category", parent.id);
+  }, [categories, categoryId, initialSubcategory, isEdit, setValue]);
+
   function selectType(nextType) {
     if (nextType === type) return;
     setValue("type", nextType, { shouldDirty: true });
     setValue("metadata", {}, { shouldDirty: true });
   }
 
+  function changeCategory(field, nextId) {
+    field.onChange(nextId);
+    const nextCategory = (categories || []).find((category) => category.id === nextId);
+    const nextOptions = getSubcategoriesForCategoryName(nextCategory?.name).map((option) => option.value);
+    if (subcategory && !nextOptions.includes(subcategory)) {
+      setValue("subcategory", "", { shouldDirty: true });
+    }
+  }
+
   async function onSubmit(values) {
     setSubmitError("");
+
+    if (values.reminderEnabled && !values.reminderAt) {
+      setError("reminderAt", { type: "required", message: "Choose a date and time, or turn the reminder off" });
+      setSubmitError("Pick a date and time for the reminder, or turn Set a reminder off.");
+      return;
+    }
+
+    const parentCategory = (categories || []).find((category) => category.id === values.category) || null;
+    const parentSectionId = getSectionIdForCategoryName(parentCategory?.name);
+    if (values.subcategory && getSectionIdForSubcategory(values.subcategory) !== parentSectionId) {
+      setSubmitError("The selected subcategory does not belong to the chosen category. Pick a subcategory for the parent category.");
+      return;
+    }
+
     const payload = {
       title: values.title.trim(),
       description: values.description || "",
       content: values.content || "",
       type: values.type,
       category: values.category || null,
+      subcategory: values.subcategory || "",
       sourceUrl: values.sourceUrl || "",
       tags: values.tags || [],
       attachments: values.attachments || [],
@@ -286,13 +340,13 @@ export function ArchiveForm({ archive = null, initialType = "note", initialCateg
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1.5">
-                <Label>Category</Label>
+                <Label>Parent category</Label>
                 <Controller
                   control={control}
                   name="category"
                   render={({ field }) => (
-                    <Select value={field.value || "none"} onValueChange={(value) => field.onChange(value === "none" ? "" : value)}>
-                      <SelectTrigger>
+                    <Select value={field.value || "none"} onValueChange={(value) => changeCategory(field, value === "none" ? "" : value)}>
+                      <SelectTrigger aria-label="Parent category">
                         <SelectValue placeholder="Choose a category" />
                       </SelectTrigger>
                       <SelectContent>
@@ -309,17 +363,54 @@ export function ArchiveForm({ archive = null, initialType = "note", initialCateg
                     </Select>
                   )}
                 />
-                {(() => {
-                  const selectedCategoryName = (categories || []).find((category) => category.id === field.value)?.name;
-                  return selectedCategoryName ? (
-                    <p className="text-[11px] text-muted-foreground">
-                      {`${SUBSECTION_SECTION_LABELS[selectedCategoryName] || "Archive"} / ${selectedCategoryName}`}
-                    </p>
-                  ) : null;
-                })()}
+                {selectedCategory ? (
+                  <p className="text-[11px] text-muted-foreground">
+                    {`${SUBSECTION_SECTION_LABELS[selectedCategory.name] || "Archive"} / ${selectedCategory.name}${
+                      selectedSubcategory ? ` / ${selectedSubcategory.label}` : ""
+                    }`}
+                  </p>
+                ) : null}
                 <p className="text-[11px] text-muted-foreground">
                   Manage categories in <Link href="/settings" className="underline underline-offset-2">settings</Link>.
                 </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Subcategory</Label>
+                {!selectedCategory ? (
+                  <p className="rounded-lg border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
+                    Choose a parent category first to pick a subcategory.
+                  </p>
+                ) : subcategoryOptions.length ? (
+                  <Controller
+                    control={control}
+                    name="subcategory"
+                    render={({ field }) => (
+                      <Select value={field.value || "none"} onValueChange={(value) => field.onChange(value === "none" ? "" : value)}>
+                        <SelectTrigger aria-label="Subcategory">
+                          <SelectValue placeholder="Choose a subcategory" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No subcategory</SelectItem>
+                          {subcategoryOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                ) : (
+                  <p className="rounded-lg border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground">
+                    No subcategories for {selectedCategory.name}. This item will be saved under the parent category only.
+                  </p>
+                )}
+                {selectedSubcategory ? (
+                  <p className="text-[11px] text-muted-foreground">
+                    Filed under {selectedSubcategory.label} — it also appears in {selectedCategory?.name}.
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-1.5">
@@ -372,21 +463,38 @@ export function ArchiveForm({ archive = null, initialType = "note", initialCateg
                       </div>
                     </div>
                     <Switch
+                      aria-label="Set a reminder"
                       checked={Boolean(field.value)}
                       onCheckedChange={(checked) => {
                         field.onChange(checked);
-                        if (!checked) setValue("reminderAt", "", { shouldDirty: true });
+                        if (!checked) {
+                          setValue("reminderAt", "", { shouldDirty: true });
+                          clearErrors("reminderAt");
+                        }
                       }}
                     />
                   </div>
                 )}
               />
               {reminderEnabled ? (
-                <Controller
-                  control={control}
-                  name="reminderAt"
-                  render={({ field }) => <Input type="datetime-local" {...field} />}
-                />
+                <>
+                  <Controller
+                    control={control}
+                    name="reminderAt"
+                    render={({ field }) => (
+                      <Input
+                        type="datetime-local"
+                        aria-label="Reminder date and time"
+                        {...field}
+                        onChange={(event) => {
+                          field.onChange(event);
+                          clearErrors("reminderAt");
+                        }}
+                      />
+                    )}
+                  />
+                  {errors.reminderAt ? <p className="text-xs text-destructive">{errors.reminderAt.message}</p> : null}
+                </>
               ) : (
                 <p className="text-[11px] leading-relaxed text-muted-foreground">No reminder set. Enable “Set a reminder” to add one.</p>
               )}
